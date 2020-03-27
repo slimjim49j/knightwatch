@@ -1,27 +1,63 @@
 import Controller from "./controller";
-import Display from "./display";
+import Display from "./display/display";
 import Engine from "./engine";
-import Game from "./game";
+import Game from "./game/game";
 
 const render = function() {
-    display.renderColor("#000000");
-}
+  display.renderColor("#000000");
+  display.drawMap(game.world.map);
 
-const update = function() {
-    game.update();
-}
+  const { posX, posY } = game.player.movement;
+  display.drawSquare({
+    x: posX,
+    y: posY,
+    width: 10,
+    height: 10
+  });
+  display.render();
+};
 
-const controller = new Controller;
+const update = function(time_stamp) {
+  router();
+  game.update();
+};
+
+const router = function() {
+  if (controller.keys.up.active) game.player.moveUp(0.5);
+  if (controller.keys.right.active) game.player.moveRight(0.5);
+  if (controller.keys.down.active) game.player.moveDown(0.5);
+  if (controller.keys.left.active) game.player.moveLeft(0.5);
+};
+
+const controller = new Controller();
 const display = new Display(document.querySelector("canvas"));
-const engine = new Engine(1000/30, render, update);
-const game = new Game;
+const engine = new Engine(1000 / 30, update, render);
+const game = new Game();
 
+display.buffer.canvas.height = game.world.height;
+display.buffer.canvas.width = game.world.width;
 
+// Event Handling
+const handleKeyChange = function(e) {
+  controller.handleKeyChange(e.type, e.keyCode);
+};
 
+const handleResize = function() {
+  display.handleResize(
+    document.documentElement.clientWidth - 32,
+    document.documentElement.clientHeight - 32,
+    game.world.height / game.world.width
+  );
+  display.render();
+};
 
-window.addEventListener("resize", display.handleResize);
-window.addEventListener("keydown", controller.handleKeyChange);
-window.addEventListener("keyup", controller.handleKeyChange);
+window.addEventListener("resize", handleResize);
+window.addEventListener("keydown", handleKeyChange);
+window.addEventListener("keyup", handleKeyChange);
 
-display.handleResize();
-engine.start();
+display.tileSheet.image.addEventListener("load", () => {
+  display.handleResize();
+  engine.start();
+});
+
+display.tileSheet.loadImage();
