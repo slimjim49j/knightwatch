@@ -10,6 +10,7 @@ class Bullet extends Entities {
   }
 
   update() {
+    debugger
     super.update(1);
 
   }

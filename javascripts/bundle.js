@@ -454,6 +454,8 @@ var Bullet = /*#__PURE__*/function (_Entities) {
   _createClass(Bullet, [{
     key: "update",
     value: function update() {
+      debugger;
+
       _get(_getPrototypeOf(Bullet.prototype), "update", this).call(this, 1);
     }
   }, {
@@ -639,7 +641,7 @@ var Gun = /*#__PURE__*/function () {
           return _this.firing = false;
         }, 2000);
         window.setTimeout(function () {
-          return _this.bullets.unshift();
+          return _this.bullets.shift();
         }, 1000);
       }
     }
@@ -650,7 +652,6 @@ var Gun = /*#__PURE__*/function () {
         bullet.update();
         return bullet.isExpired(timeStamp);
       });
-      console.log(this.bullets);
     }
   }]);
 

@@ -13,7 +13,7 @@ class Gun {
             this.bullets.push(new Bullet(movement));
             this.firing = true;
             window.setTimeout(() => this.firing = false, 2000);
-            window.setTimeout(() => this.bullets.unshift(), 1000);
+            window.setTimeout(() => this.bullets.shift(), 1000);
         }
     }
 
@@ -22,7 +22,6 @@ class Gun {
             bullet.update();
             return bullet.isExpired(timeStamp);
         });
-        console.log(this.bullets)
     }
 }
 
