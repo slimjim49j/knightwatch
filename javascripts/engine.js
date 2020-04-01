@@ -2,11 +2,11 @@
 //   ensures that game gets updated at constant rate
 
 class Engine {
-  constructor(time_step, update, render) {
-    this.accumulated_time = 0;
-    this.animation_frame_request = undefined;
+  constructor(timeStep, update, render) {
+    this.accumulatedTime = 0;
+    this.animationFrameRequest = undefined;
     this.time = undefined;
-    this.time_step = time_step;
+    this.timeStep = timeStep;
 
     this.updated = false;
 
@@ -20,25 +20,25 @@ class Engine {
     this.stop = this.stop.bind(this);
   }
 
-  run(time_stamp) {
+  run(timeStamp) {
     // request next frame
-    this.animation_frame_request = window.requestAnimationFrame(this.run);
+    this.animationFrameRequest = window.requestAnimationFrame(this.run);
 
     // update accumulated time, time
-    this.accumulated_time += time_stamp - this.time;
-    this.time = time_stamp;
+    this.accumulatedTime += timeStamp - this.time;
+    this.time = timeStamp;
 
     // if accumulated time is too large, only create one update
     // this prevents a memory spiral
-    if (this.accumulated_time >= this.time_step * 3) {
-      this.accumulated_time = this.time_step;
+    if (this.accumulatedTime >= this.timeStep * 3) {
+      this.accumulatedTime = this.timeStep;
     }
 
     // update game state
-    while (this.accumulated_time >= this.time_step) {
-      this.accumulated_time -= this.time_step;
+    while (this.accumulatedTime >= this.timeStep) {
+      this.accumulatedTime -= this.timeStep;
 
-      this.update(time_stamp);
+      this.update(timeStamp);
       this.updated = true;
     }
 
@@ -46,18 +46,18 @@ class Engine {
     // not in while loop since this would cause multiple renders
     if (this.updated) {
       this.updated = false;
-      this.render(time_stamp);
+      this.render(timeStamp);
     }
   }
 
   start() {
-    this.accumulated_time = this.time_step;
+    this.accumulatedTime = this.timeStep;
     this.time = window.performance.now();
-    this.animation_frame_request = window.requestAnimationFrame(this.run);
+    this.animationFrameRequest = window.requestAnimationFrame(this.run);
   }
 
   stop() {
-    window.cancelAnimationFrame(this.animation_frame_request);
+    window.cancelAnimationFrame(this.animationFrameRequest);
   }
 }
 

@@ -30,7 +30,9 @@ class Controller {
     console.log(this.keys);
   }
 
-  handleClickChange(e) {}
+  handleClickChange(e) {
+    
+  }
 }
 
 Controller.ButtonInput = class {

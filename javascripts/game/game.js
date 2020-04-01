@@ -10,11 +10,17 @@ class Game {
       velY: 0
     });
 
+    this.bullets = [];
+
     this.world = new World();
   }
 
-  update() {
+  update(timeStamp) {
     this.player.update(this.world.friction);
+  }
+
+  addBullet(bullet) {
+    
   }
 }
 

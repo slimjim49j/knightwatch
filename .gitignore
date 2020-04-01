@@ -1,5 +1,5 @@
 /node_modules
-/javascripts/bundle.js
+# /javascripts/bundle.js
 /javascripts/bundle.js.map
 
 /tileset/frames

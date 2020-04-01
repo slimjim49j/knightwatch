@@ -17,9 +17,9 @@ const render = function() {
   display.render();
 };
 
-const update = function(time_stamp) {
+const update = function(timeStamp) {
   router();
-  game.update();
+  game.update(timeStamp);
 };
 
 const router = function() {
@@ -51,12 +51,21 @@ const handleResize = function() {
   display.render();
 };
 
+const handleClick = function(e) {
+  game.player.requestFire(e.offsetX, e.offsetY);
+};
+
 window.addEventListener("resize", handleResize);
 window.addEventListener("keydown", handleKeyChange);
 window.addEventListener("keyup", handleKeyChange);
+window.addEventListener("click", handleClick);
 
 display.tileSheet.image.addEventListener("load", () => {
-  display.handleResize();
+  display.handleResize(
+    document.documentElement.clientWidth - 32,
+    document.documentElement.clientHeight - 32,
+    game.world.height / game.world.width
+  );
   engine.start();
 });
 
