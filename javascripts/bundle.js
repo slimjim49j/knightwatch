@@ -411,10 +411,6 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
-
-function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
-
 function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
@@ -454,9 +450,9 @@ var Bullet = /*#__PURE__*/function (_Entities) {
   _createClass(Bullet, [{
     key: "update",
     value: function update() {
-      debugger;
-
-      _get(_getPrototypeOf(Bullet.prototype), "update", this).call(this, 1);
+      // debugger
+      console.log(this.movement);
+      _entities__WEBPACK_IMPORTED_MODULE_0__["default"].prototype.update.call(this, 1);
     }
   }, {
     key: "isExpired",
@@ -639,10 +635,10 @@ var Gun = /*#__PURE__*/function () {
         this.firing = true;
         window.setTimeout(function () {
           return _this.firing = false;
-        }, 2000);
+        }, 300);
         window.setTimeout(function () {
           return _this.bullets.shift();
-        }, 1000);
+        }, 5000);
       }
     }
   }, {
@@ -721,9 +717,9 @@ var Player = /*#__PURE__*/function (_Entities) {
     key: "requestFire",
     value: function requestFire() {
       this.gun.fire({
-        posX: this.posX,
-        posY: this.posY,
-        velX: 1,
+        posX: this.movement.posX,
+        posY: this.movement.posY,
+        velX: 10,
         velY: 0
       });
     }
@@ -799,6 +795,15 @@ var render = function render() {
     y: posY,
     width: 10,
     height: 10
+  }); // temp bullets
+
+  game.player.gun.bullets.forEach(function (bullet) {
+    display.drawSquare({
+      x: bullet.movement.posX,
+      y: bullet.movement.posY,
+      width: 3,
+      height: 3
+    });
   });
   display.render();
 };

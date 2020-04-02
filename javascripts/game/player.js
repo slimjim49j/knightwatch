@@ -9,9 +9,9 @@ class Player extends Entities {
 
   requestFire() {
     this.gun.fire({ 
-      posX: this.posX,
-      posY: this.posY,
-      velX: 1,
+      posX: this.movement.posX,
+      posY: this.movement.posY,
+      velX: 10,
       velY: 0,
     });
   }

@@ -12,8 +12,8 @@ class Gun {
             // debugger
             this.bullets.push(new Bullet(movement));
             this.firing = true;
-            window.setTimeout(() => this.firing = false, 2000);
-            window.setTimeout(() => this.bullets.shift(), 1000);
+            window.setTimeout(() => this.firing = false, 300);
+            window.setTimeout(() => this.bullets.shift(), 5000);
         }
     }
 

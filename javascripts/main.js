@@ -14,6 +14,17 @@ const render = function() {
     width: 10,
     height: 10
   });
+
+  // temp bullets
+  game.player.gun.bullets.forEach(bullet => {
+    display.drawSquare({
+      x: bullet.movement.posX,
+      y: bullet.movement.posY,
+      width: 3,
+      height: 3
+    });
+  });
+
   display.render();
 };
 
