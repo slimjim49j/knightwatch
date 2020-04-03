@@ -63,6 +63,8 @@ const handleResize = function() {
 };
 
 const handleClick = function(e) {
+  // debugger
+  // console.log(e.offsetX, e.offsetY);
   game.player.requestFire(e.offsetX, e.offsetY);
 };
 

@@ -136,9 +136,8 @@ var Controller = /*#__PURE__*/function () {
         case 65:
           this.keys.left.setActive(keyDown);
           break;
-      }
+      } // console.log(this.keys);
 
-      console.log(this.keys);
     }
   }, {
     key: "handleClickChange",
@@ -217,7 +216,7 @@ var Display = /*#__PURE__*/function () {
           y = _ref.y,
           width = _ref.width,
           height = _ref.height;
-      console.log(x, y);
+      // console.log(x, y);
       this.buffer.fillStyle = "white";
       this.buffer.fillRect(Math.round(x), Math.round(y), width, height);
     }
@@ -247,7 +246,7 @@ var Display = /*#__PURE__*/function () {
     }
   }, {
     key: "handleResize",
-    value: function handleResize(height, width, worldRatio) {
+    value: function handleResize(width, height, worldRatio) {
       if (height / width > worldRatio) {
         this.context.canvas.height = width * worldRatio;
         this.context.canvas.width = width;
@@ -451,7 +450,7 @@ var Bullet = /*#__PURE__*/function (_Entities) {
     key: "update",
     value: function update() {
       // debugger
-      console.log(this.movement);
+      // console.log(this.movement)
       _entities__WEBPACK_IMPORTED_MODULE_0__["default"].prototype.update.call(this, 1);
     }
   }, {
@@ -715,12 +714,18 @@ var Player = /*#__PURE__*/function (_Entities) {
 
   _createClass(Player, [{
     key: "requestFire",
-    value: function requestFire() {
+    value: function requestFire(mouseX, mouseY) {
+      var _this$movement = this.movement,
+          playerX = _this$movement.posX,
+          playerY = _this$movement.posY;
+      var angle = Math.atan((mouseY - playerY) / (mouseX - playerX)); // debugger
+
+      console.log(mouseX, mouseY, playerX, playerY);
       this.gun.fire({
-        posX: this.movement.posX,
-        posY: this.movement.posY,
-        velX: 10,
-        velY: 0
+        posX: playerX,
+        posY: playerY,
+        velX: 5 * Math.cos(angle),
+        velY: 5 * Math.sin(angle)
       });
     }
   }, {
@@ -837,6 +842,8 @@ var handleResize = function handleResize() {
 };
 
 var handleClick = function handleClick(e) {
+  // debugger
+  // console.log(e.offsetX, e.offsetY);
   game.player.requestFire(e.offsetX, e.offsetY);
 };
 

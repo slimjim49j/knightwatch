@@ -11,7 +11,7 @@ class Bullet extends Entities {
 
   update() {
     // debugger
-    console.log(this.movement)
+    // console.log(this.movement)
     Entities.prototype.update.call(this, 1);
 
   }

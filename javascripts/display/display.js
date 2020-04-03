@@ -28,7 +28,7 @@ class Display {
   }
 
   drawSquare({ x, y, width, height }) {
-    console.log(x, y);
+    // console.log(x, y);
     this.buffer.fillStyle = "white";
     this.buffer.fillRect(Math.round(x), Math.round(y), width, height);
   }
@@ -73,7 +73,7 @@ class Display {
     );
   }
 
-  handleResize(height, width, worldRatio) {
+  handleResize(width, height, worldRatio) {
     if (height / width > worldRatio) {
       this.context.canvas.height = width * worldRatio;
       this.context.canvas.width = width;

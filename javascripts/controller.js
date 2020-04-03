@@ -27,7 +27,7 @@ class Controller {
         this.keys.left.setActive(keyDown);
         break;
     }
-    console.log(this.keys);
+    // console.log(this.keys);
   }
 
   handleClickChange(e) {
