@@ -844,7 +844,12 @@ var handleResize = function handleResize() {
 var handleClick = function handleClick(e) {
   // debugger
   // console.log(e.offsetX, e.offsetY);
-  game.player.requestFire(e.offsetX, e.offsetY);
+  // const worldRatio = game.world.height / game.world.width;
+  // console.log(worldRatio);
+  // console.log(e.offsetX * worldRatio, e.offsetY * worldRatio);
+  var worldRatio = game.world.width / display.context.canvas.width;
+  console.log(worldRatio);
+  game.player.requestFire(e.offsetX * worldRatio, e.offsetY * worldRatio);
 };
 
 window.addEventListener("resize", handleResize);
