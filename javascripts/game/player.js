@@ -8,11 +8,9 @@ class Player extends Entities {
   }
 
   requestFire(mouseX, mouseY) {
-    const {posX: playerX, posY: playerY } = this.movement;
-    const angle = Math.atan((mouseY - playerY) / (mouseX - playerX))
-    // debugger
-    console.log(mouseX, mouseY, playerX, playerY);
-    this.gun.fire({ 
+    const { posX: playerX, posY: playerY } = this.movement;
+    const angle = Math.atan2(mouseY - playerY, mouseX - playerX);
+    this.gun.fire({
       posX: playerX,
       posY: playerY,
       velX: 5 * Math.cos(angle),

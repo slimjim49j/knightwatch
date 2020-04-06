@@ -718,9 +718,7 @@ var Player = /*#__PURE__*/function (_Entities) {
       var _this$movement = this.movement,
           playerX = _this$movement.posX,
           playerY = _this$movement.posY;
-      var angle = Math.atan((mouseY - playerY) / (mouseX - playerX)); // debugger
-
-      console.log(mouseX, mouseY, playerX, playerY);
+      var angle = Math.atan2(mouseY - playerY, mouseX - playerX);
       this.gun.fire({
         posX: playerX,
         posY: playerY,
@@ -842,13 +840,7 @@ var handleResize = function handleResize() {
 };
 
 var handleClick = function handleClick(e) {
-  // debugger
-  // console.log(e.offsetX, e.offsetY);
-  // const worldRatio = game.world.height / game.world.width;
-  // console.log(worldRatio);
-  // console.log(e.offsetX * worldRatio, e.offsetY * worldRatio);
   var worldRatio = game.world.width / display.context.canvas.width;
-  console.log(worldRatio);
   game.player.requestFire(e.offsetX * worldRatio, e.offsetY * worldRatio);
 };
 

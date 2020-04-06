@@ -63,15 +63,7 @@ const handleResize = function() {
 };
 
 const handleClick = function(e) {
-  // debugger
-  // console.log(e.offsetX, e.offsetY);
-
-  // const worldRatio = game.world.height / game.world.width;
-  // console.log(worldRatio);
-  // console.log(e.offsetX * worldRatio, e.offsetY * worldRatio);
-
   const worldRatio = game.world.width / display.context.canvas.width;
-  console.log(worldRatio);
   game.player.requestFire(e.offsetX * worldRatio, e.offsetY * worldRatio);
 };
 
