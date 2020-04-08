@@ -7,21 +7,32 @@ const render = function() {
   display.renderColor("#000000");
   display.drawMap(game.world.map);
 
-  const { posX, posY } = game.player.movement;
+  // draw player
+  const { posX: playerX, posY: playerY } = game.player.movement;
   display.drawSquare({
-    x: posX,
-    y: posY,
-    width: 10,
-    height: 10
+    x: playerX,
+    y: playerY,
+    width: game.player.height,
+    height: game.player.width
   });
+
+  // draw enemies
+  game.enemies.forEach(enemy => {
+    display.drawSquare({
+      x: enemy.movement.posX,
+      y: enemy.movement.posY,
+      width: enemy.height,
+      height: enemy.width,
+    });
+  })
 
   // temp bullets
   game.player.gun.bullets.forEach(bullet => {
     display.drawSquare({
       x: bullet.movement.posX,
       y: bullet.movement.posY,
-      width: 3,
-      height: 3
+      width: bullet.height,
+      height: bullet.width
     });
   });
 

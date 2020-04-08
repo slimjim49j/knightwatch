@@ -431,18 +431,19 @@ var Bullet = /*#__PURE__*/function (_Entities) {
 
   var _super = _createSuper(Bullet);
 
-  function Bullet(movement) {
+  function Bullet(width, height, expireTime, movement) {
     var _this;
 
     _classCallCheck(this, Bullet);
 
-    _this = _super.call(this, movement); // this.spawnTime = spawnTime;
+    _this = _super.call(this, width, height, movement); // this.spawnTime = spawnTime;
     // this.expirationTime = 5000;
 
     _this.expired = false;
     window.setTimeout(function () {
       return _this.expired = true;
-    }, 1000);
+    }, expireTime);
+    _this.damage = 2;
     return _this;
   }
 
@@ -459,12 +460,111 @@ var Bullet = /*#__PURE__*/function (_Entities) {
       // return (currentTime - this.spawnTime) > this.expirationTime;
       return this.expired;
     }
+  }, {
+    key: "isColliding",
+    value: function isColliding(object) {
+      if (this.movement.posX > object.movement.posX && this.movement.posX < object.movement.posX + object.width && this.movement.posY > object.movement.posY && this.movement.posY < object.movement.posY + object.height) {
+        this.expired = true;
+        return true;
+      }
+
+      return false;
+    }
   }]);
 
   return Bullet;
 }(_entities__WEBPACK_IMPORTED_MODULE_0__["default"]);
 
 /* harmony default export */ __webpack_exports__["default"] = (Bullet);
+
+/***/ }),
+
+/***/ "./javascripts/game/enemy.js":
+/*!***********************************!*\
+  !*** ./javascripts/game/enemy.js ***!
+  \***********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _entities__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./entities */ "./javascripts/game/entities.js");
+/* harmony import */ var _gun__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./gun */ "./javascripts/game/gun.js");
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+
+var Enemy = /*#__PURE__*/function (_Entities) {
+  _inherits(Enemy, _Entities);
+
+  var _super = _createSuper(Enemy);
+
+  function Enemy(width, height, movement) {
+    var _this;
+
+    _classCallCheck(this, Enemy);
+
+    _this = _super.call(this, width, height, movement);
+    _this.gun = new _gun__WEBPACK_IMPORTED_MODULE_1__["default"](10000);
+
+    _this.requestFire(0, 0);
+
+    return _this;
+  }
+
+  _createClass(Enemy, [{
+    key: "requestFire",
+    value: function requestFire(mouseX, mouseY) {
+      var _this$movement = this.movement,
+          enemyX = _this$movement.posX,
+          enemyY = _this$movement.posY;
+      var angle = Math.atan2(mouseY - enemyY, mouseX - enemyX);
+      this.gun.fire({
+        posX: enemyX,
+        posY: enemyY,
+        velX: 0,
+        velY: 0
+      });
+    }
+  }, {
+    key: "update",
+    value: function update(friction) {
+      _get(_getPrototypeOf(Enemy.prototype), "update", this).call(this, friction);
+
+      this.gun.update();
+      console.log(this.gun.bullets);
+    }
+  }]);
+
+  return Enemy;
+}(_entities__WEBPACK_IMPORTED_MODULE_0__["default"]);
+
+/* harmony default export */ __webpack_exports__["default"] = (Enemy);
 
 /***/ }),
 
@@ -484,7 +584,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 var Entities = /*#__PURE__*/function () {
-  function Entities(_ref) {
+  function Entities(width, height, _ref) {
     var posX = _ref.posX,
         posY = _ref.posY,
         velX = _ref.velX,
@@ -498,6 +598,8 @@ var Entities = /*#__PURE__*/function () {
       velX: velX,
       velY: velY
     };
+    this.width = width;
+    this.height = height;
     this.moveUp = this.moveUp.bind(this);
     this.moveRight = this.moveRight.bind(this);
     this.moveDown = this.moveDown.bind(this);
@@ -554,8 +656,9 @@ var Entities = /*#__PURE__*/function () {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _player__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./player */ "./javascripts/game/player.js");
-/* harmony import */ var _world__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./world */ "./javascripts/game/world.js");
+/* harmony import */ var _enemy__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./enemy */ "./javascripts/game/enemy.js");
+/* harmony import */ var _player__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./player */ "./javascripts/game/player.js");
+/* harmony import */ var _world__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./world */ "./javascripts/game/world.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -565,28 +668,58 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
+
 var Game = /*#__PURE__*/function () {
   function Game() {
     _classCallCheck(this, Game);
 
-    this.player = new _player__WEBPACK_IMPORTED_MODULE_0__["default"]({
+    this.player = new _player__WEBPACK_IMPORTED_MODULE_1__["default"](10, 10, {
       posX: 50,
       posY: 50,
       velX: 0,
       velY: 0
     });
     this.bullets = [];
-    this.world = new _world__WEBPACK_IMPORTED_MODULE_1__["default"]();
+    this.enemies = [new _enemy__WEBPACK_IMPORTED_MODULE_0__["default"](10, 10, {
+      posX: 100,
+      posY: 100,
+      velX: 0,
+      velY: 0
+    })];
+    this.world = new _world__WEBPACK_IMPORTED_MODULE_2__["default"]();
+    this.playerCollisionDetection = this.playerCollisionDetection.bind(this);
   }
 
   _createClass(Game, [{
     key: "update",
     value: function update(timeStamp) {
+      var _this = this;
+
       this.player.update(this.world.friction);
+      this.enemies.forEach(function (enemy) {
+        return enemy.update(_this.world.friction);
+      });
+      this.playerCollisionDetection();
     }
   }, {
-    key: "addBullet",
-    value: function addBullet(bullet) {}
+    key: "playerCollisionDetection",
+    value: function playerCollisionDetection() {
+      var _this2 = this;
+
+      this.enemies.forEach(function (enemy) {
+        // debugger
+        enemy.gun.bullets.forEach(function (bullet) {
+          // debugger
+          if (bullet.isColliding(_this2.player)) {
+            // debugger
+            _this2.player.health -= bullet.damage;
+          }
+
+          console.log(_this2.player.health);
+        }, _this2);
+      }, this);
+    } // addBullet(bullet) {}
+
   }]);
 
   return Game;
@@ -615,11 +748,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 var Gun = /*#__PURE__*/function () {
-  function Gun() {
+  function Gun(bulletExpireTime) {
     _classCallCheck(this, Gun);
 
     this.fireInterval;
     this.bullets = [];
+    this.bulletExpireTime = bulletExpireTime;
     this.firing = false;
   }
 
@@ -630,22 +764,19 @@ var Gun = /*#__PURE__*/function () {
 
       if (!this.firing) {
         // debugger
-        this.bullets.push(new _bullet__WEBPACK_IMPORTED_MODULE_0__["default"](movement));
+        this.bullets.push(new _bullet__WEBPACK_IMPORTED_MODULE_0__["default"](3, 3, this.bulletExpireTime, movement));
         this.firing = true;
         window.setTimeout(function () {
           return _this.firing = false;
         }, 300);
-        window.setTimeout(function () {
-          return _this.bullets.shift();
-        }, 5000);
       }
     }
   }, {
     key: "update",
     value: function update(timeStamp) {
-      this.bullets.filter(function (bullet) {
+      this.bullets = this.bullets.filter(function (bullet) {
         bullet.update();
-        return bullet.isExpired(timeStamp);
+        return !bullet.isExpired(timeStamp);
       });
     }
   }]);
@@ -702,13 +833,14 @@ var Player = /*#__PURE__*/function (_Entities) {
 
   var _super = _createSuper(Player);
 
-  function Player(movement) {
+  function Player(width, height, movement) {
     var _this;
 
     _classCallCheck(this, Player);
 
-    _this = _super.call(this, movement);
-    _this.gun = new _gun__WEBPACK_IMPORTED_MODULE_1__["default"]();
+    _this = _super.call(this, width, height, movement);
+    _this.gun = new _gun__WEBPACK_IMPORTED_MODULE_1__["default"](5000);
+    _this.health = 7;
     return _this;
   }
 
@@ -789,23 +921,33 @@ __webpack_require__.r(__webpack_exports__);
 
 var render = function render() {
   display.renderColor("#000000");
-  display.drawMap(game.world.map);
+  display.drawMap(game.world.map); // draw player
+
   var _game$player$movement = game.player.movement,
-      posX = _game$player$movement.posX,
-      posY = _game$player$movement.posY;
+      playerX = _game$player$movement.posX,
+      playerY = _game$player$movement.posY;
   display.drawSquare({
-    x: posX,
-    y: posY,
-    width: 10,
-    height: 10
+    x: playerX,
+    y: playerY,
+    width: game.player.height,
+    height: game.player.width
+  }); // draw enemies
+
+  game.enemies.forEach(function (enemy) {
+    display.drawSquare({
+      x: enemy.movement.posX,
+      y: enemy.movement.posY,
+      width: enemy.height,
+      height: enemy.width
+    });
   }); // temp bullets
 
   game.player.gun.bullets.forEach(function (bullet) {
     display.drawSquare({
       x: bullet.movement.posX,
       y: bullet.movement.posY,
-      width: 3,
-      height: 3
+      width: bullet.height,
+      height: bullet.width
     });
   });
   display.render();

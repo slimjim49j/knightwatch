@@ -1,11 +1,13 @@
 class Entities {
-  constructor({ posX, posY, velX, velY }) {
+  constructor(width, height, { posX, posY, velX, velY }) {
     this.movement = {
       posX: posX,
       posY: posY,
       velX: velX,
       velY: velY
     };
+    this.width = width;
+    this.height = height;
 
     this.moveUp = this.moveUp.bind(this);
     this.moveRight = this.moveRight.bind(this);
