@@ -530,33 +530,32 @@ var Enemy = /*#__PURE__*/function (_Entities) {
     _classCallCheck(this, Enemy);
 
     _this = _super.call(this, width, height, movement);
-    _this.gun = new _gun__WEBPACK_IMPORTED_MODULE_1__["default"](10000);
-
-    _this.requestFire(0, 0);
-
+    _this.gun = new _gun__WEBPACK_IMPORTED_MODULE_1__["default"](1000, 10000);
+    _this.health = 5;
     return _this;
   }
 
   _createClass(Enemy, [{
     key: "requestFire",
-    value: function requestFire(mouseX, mouseY) {
+    value: function requestFire(targetX, targetY) {
       var _this$movement = this.movement,
           enemyX = _this$movement.posX,
           enemyY = _this$movement.posY;
-      var angle = Math.atan2(mouseY - enemyY, mouseX - enemyX);
+      var angle = Math.atan2(targetY - enemyY, targetX - enemyX);
       this.gun.fire({
         posX: enemyX,
         posY: enemyY,
-        velX: 0,
-        velY: 0
+        velX: 5 * Math.cos(angle),
+        velY: 5 * Math.sin(angle)
       });
     }
   }, {
     key: "update",
-    value: function update(friction) {
+    value: function update(friction, playerX, playerY) {
       _get(_getPrototypeOf(Enemy.prototype), "update", this).call(this, friction);
 
       this.gun.update();
+      this.requestFire(playerX, playerY);
       console.log(this.gun.bullets);
     }
   }]);
@@ -599,35 +598,10 @@ var Entities = /*#__PURE__*/function () {
       velY: velY
     };
     this.width = width;
-    this.height = height;
-    this.moveUp = this.moveUp.bind(this);
-    this.moveRight = this.moveRight.bind(this);
-    this.moveDown = this.moveDown.bind(this);
-    this.moveLeft = this.moveLeft.bind(this);
-    this.update = this.update.bind(this);
+    this.height = height; // this.update = this.update.bind(this);
   }
 
   _createClass(Entities, [{
-    key: "moveUp",
-    value: function moveUp(vel) {
-      this.movement.velY -= vel;
-    }
-  }, {
-    key: "moveRight",
-    value: function moveRight(vel) {
-      this.movement.velX += vel;
-    }
-  }, {
-    key: "moveDown",
-    value: function moveDown(vel) {
-      this.movement.velY += vel;
-    }
-  }, {
-    key: "moveLeft",
-    value: function moveLeft(vel) {
-      this.movement.velX -= vel;
-    }
-  }, {
     key: "update",
     value: function update(friction) {
       this.movement.velX *= friction;
@@ -687,7 +661,7 @@ var Game = /*#__PURE__*/function () {
       velY: 0
     })];
     this.world = new _world__WEBPACK_IMPORTED_MODULE_2__["default"]();
-    this.playerCollisionDetection = this.playerCollisionDetection.bind(this);
+    this.bulletCollisionDetection = this.bulletCollisionDetection.bind(this);
   }
 
   _createClass(Game, [{
@@ -697,26 +671,32 @@ var Game = /*#__PURE__*/function () {
 
       this.player.update(this.world.friction);
       this.enemies.forEach(function (enemy) {
-        return enemy.update(_this.world.friction);
+        return enemy.update(_this.world.friction, _this.player.movement.posX, _this.player.movement.posY);
       });
-      this.playerCollisionDetection();
+      this.bulletCollisionDetection();
     }
   }, {
-    key: "playerCollisionDetection",
-    value: function playerCollisionDetection() {
+    key: "bulletCollisionDetection",
+    value: function bulletCollisionDetection() {
       var _this2 = this;
 
       this.enemies.forEach(function (enemy) {
-        // debugger
+        // player bullet collision
         enemy.gun.bullets.forEach(function (bullet) {
-          // debugger
           if (bullet.isColliding(_this2.player)) {
-            // debugger
             _this2.player.health -= bullet.damage;
           }
 
-          console.log(_this2.player.health);
-        }, _this2);
+          console.log("player health:", _this2.player.health);
+        }, _this2); // enemy bullet collision
+
+        _this2.player.gun.bullets.forEach(function (bullet) {
+          if (bullet.isColliding(enemy)) {
+            enemy.health -= bullet.damage;
+          }
+
+          console.log("enemy health:", enemy.health);
+        });
       }, this);
     } // addBullet(bullet) {}
 
@@ -748,10 +728,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 var Gun = /*#__PURE__*/function () {
-  function Gun(bulletExpireTime) {
+  function Gun(fireInterval, bulletExpireTime) {
     _classCallCheck(this, Gun);
 
-    this.fireInterval;
+    this.fireInterval = fireInterval;
     this.bullets = [];
     this.bulletExpireTime = bulletExpireTime;
     this.firing = false;
@@ -768,7 +748,7 @@ var Gun = /*#__PURE__*/function () {
         this.firing = true;
         window.setTimeout(function () {
           return _this.firing = false;
-        }, 300);
+        }, this.fireInterval);
       }
     }
   }, {
@@ -839,7 +819,7 @@ var Player = /*#__PURE__*/function (_Entities) {
     _classCallCheck(this, Player);
 
     _this = _super.call(this, width, height, movement);
-    _this.gun = new _gun__WEBPACK_IMPORTED_MODULE_1__["default"](5000);
+    _this.gun = new _gun__WEBPACK_IMPORTED_MODULE_1__["default"](300, 5000);
     _this.health = 7;
     return _this;
   }
@@ -864,6 +844,26 @@ var Player = /*#__PURE__*/function (_Entities) {
       _get(_getPrototypeOf(Player.prototype), "update", this).call(this, friction);
 
       this.gun.update();
+    }
+  }, {
+    key: "moveUp",
+    value: function moveUp(vel) {
+      this.movement.velY -= vel;
+    }
+  }, {
+    key: "moveRight",
+    value: function moveRight(vel) {
+      this.movement.velX += vel;
+    }
+  }, {
+    key: "moveDown",
+    value: function moveDown(vel) {
+      this.movement.velY += vel;
+    }
+  }, {
+    key: "moveLeft",
+    value: function moveLeft(vel) {
+      this.movement.velX -= vel;
     }
   }]);
 
@@ -948,6 +948,16 @@ var render = function render() {
       y: bullet.movement.posY,
       width: bullet.height,
       height: bullet.width
+    });
+  });
+  game.enemies.forEach(function (enemy) {
+    enemy.gun.bullets.forEach(function (bullet) {
+      display.drawSquare({
+        x: bullet.movement.posX,
+        y: bullet.movement.posY,
+        width: bullet.height,
+        height: bullet.width
+      });
     });
   });
   display.render();

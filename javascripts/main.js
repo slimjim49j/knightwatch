@@ -36,6 +36,17 @@ const render = function() {
     });
   });
 
+  game.enemies.forEach(enemy => {
+    enemy.gun.bullets.forEach(bullet => {
+      display.drawSquare({
+        x: bullet.movement.posX,
+        y: bullet.movement.posY,
+        width: bullet.height,
+        height: bullet.width,
+      });
+    });
+  })
+
   display.render();
 };
 

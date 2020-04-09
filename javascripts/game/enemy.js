@@ -4,24 +4,25 @@ import Gun from "./gun";
 class Enemy extends Entities {
   constructor(width, height, movement) {
     super(width, height, movement);
-    this.gun = new Gun(10000);
-    this.requestFire(0, 0);
+    this.gun = new Gun(1000, 10000);
+    this.health = 5;
   }
 
-  requestFire(mouseX, mouseY) {
+  requestFire(targetX, targetY) {
     const { posX: enemyX, posY: enemyY } = this.movement;
-    const angle = Math.atan2(mouseY - enemyY, mouseX - enemyX);
+    const angle = Math.atan2(targetY - enemyY, targetX - enemyX);
     this.gun.fire({
       posX: enemyX,
       posY: enemyY,
-      velX: 0,
-      velY: 0,
+      velX: 5 * Math.cos(angle),
+      velY: 5 * Math.sin(angle),
     });
   }
 
-  update(friction) {
+  update(friction, playerX, playerY) {
     super.update(friction);
     this.gun.update();
+    this.requestFire(playerX, playerY);
     console.log(this.gun.bullets)
   }
 }

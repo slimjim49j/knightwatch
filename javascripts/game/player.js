@@ -4,7 +4,7 @@ import Gun from "./gun";
 class Player extends Entities {
   constructor(width, height, movement) {
     super(width, height, movement);
-    this.gun = new Gun(5000);
+    this.gun = new Gun(300, 5000);
     this.health = 7;
   }
 
@@ -22,6 +22,24 @@ class Player extends Entities {
   update(friction) {
     super.update(friction);
     this.gun.update();
+  }
+
+
+
+  moveUp(vel) {
+    this.movement.velY -= vel;
+  }
+
+  moveRight(vel) {
+    this.movement.velX += vel;
+  }
+
+  moveDown(vel) {
+    this.movement.velY += vel;
+  }
+
+  moveLeft(vel) {
+    this.movement.velX -= vel;
   }
 }
 

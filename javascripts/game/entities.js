@@ -9,27 +9,7 @@ class Entities {
     this.width = width;
     this.height = height;
 
-    this.moveUp = this.moveUp.bind(this);
-    this.moveRight = this.moveRight.bind(this);
-    this.moveDown = this.moveDown.bind(this);
-    this.moveLeft = this.moveLeft.bind(this);
-    this.update = this.update.bind(this);
-  }
-
-  moveUp(vel) {
-    this.movement.velY -= vel;
-  }
-
-  moveRight(vel) {
-    this.movement.velX += vel;
-  }
-
-  moveDown(vel) {
-    this.movement.velY += vel;
-  }
-
-  moveLeft(vel) {
-    this.movement.velX -= vel;
+    // this.update = this.update.bind(this);
   }
 
   update(friction) {

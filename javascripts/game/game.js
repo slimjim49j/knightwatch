@@ -18,26 +18,38 @@ class Game {
 
     this.world = new World();
 
-    this.playerCollisionDetection = this.playerCollisionDetection.bind(this);
+    this.bulletCollisionDetection = this.bulletCollisionDetection.bind(this);
   }
 
   update(timeStamp) {
     this.player.update(this.world.friction);
-    this.enemies.forEach(enemy => enemy.update(this.world.friction));
-    this.playerCollisionDetection();
+    this.enemies.forEach((enemy) =>
+      enemy.update(
+        this.world.friction,
+        this.player.movement.posX,
+        this.player.movement.posY
+      )
+    );
+    this.bulletCollisionDetection();
   }
 
-  playerCollisionDetection() {
+  bulletCollisionDetection() {
     this.enemies.forEach(enemy => {
-      // debugger
+      // player bullet collision
       enemy.gun.bullets.forEach(bullet => {
-        // debugger
         if (bullet.isColliding(this.player)) {
-          // debugger
           this.player.health -= bullet.damage;
         }
-        console.log(this.player.health);
+        console.log("player health:", this.player.health);
       }, this);
+
+      // enemy bullet collision
+      this.player.gun.bullets.forEach(bullet => {
+        if (bullet.isColliding(enemy)) {
+          enemy.health -= bullet.damage;
+        }
+        console.log("enemy health:", enemy.health);
+      });
     }, this);
   }
 
