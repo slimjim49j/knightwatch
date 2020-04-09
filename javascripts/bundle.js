@@ -532,6 +532,7 @@ var Enemy = /*#__PURE__*/function (_Entities) {
     _this = _super.call(this, width, height, movement);
     _this.gun = new _gun__WEBPACK_IMPORTED_MODULE_1__["default"](1000, 10000);
     _this.health = 5;
+    _this.despawn = false;
     return _this;
   }
 
@@ -552,11 +553,18 @@ var Enemy = /*#__PURE__*/function (_Entities) {
   }, {
     key: "update",
     value: function update(friction, playerX, playerY) {
+      if (this.health <= 0) this.handleDespawn();
+
       _get(_getPrototypeOf(Enemy.prototype), "update", this).call(this, friction);
 
       this.gun.update();
       this.requestFire(playerX, playerY);
       console.log(this.gun.bullets);
+    }
+  }, {
+    key: "handleDespawn",
+    value: function handleDespawn() {
+      this.despawn = true;
     }
   }]);
 
@@ -669,11 +677,12 @@ var Game = /*#__PURE__*/function () {
     value: function update(timeStamp) {
       var _this = this;
 
-      this.player.update(this.world.friction);
-      this.enemies.forEach(function (enemy) {
-        return enemy.update(_this.world.friction, _this.player.movement.posX, _this.player.movement.posY);
-      });
       this.bulletCollisionDetection();
+      this.player.update(this.world.friction);
+      this.enemies = this.enemies.filter(function (enemy) {
+        enemy.update(_this.world.friction, _this.player.movement.posX, _this.player.movement.posY);
+        return !enemy.despawn;
+      });
     }
   }, {
     key: "bulletCollisionDetection",

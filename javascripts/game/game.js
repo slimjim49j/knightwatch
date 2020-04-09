@@ -22,15 +22,16 @@ class Game {
   }
 
   update(timeStamp) {
+    this.bulletCollisionDetection();
     this.player.update(this.world.friction);
-    this.enemies.forEach((enemy) =>
+    this.enemies = this.enemies.filter(enemy => {
       enemy.update(
         this.world.friction,
         this.player.movement.posX,
         this.player.movement.posY
       )
-    );
-    this.bulletCollisionDetection();
+      return !enemy.despawn;
+    });
   }
 
   bulletCollisionDetection() {

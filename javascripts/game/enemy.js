@@ -6,6 +6,7 @@ class Enemy extends Entities {
     super(width, height, movement);
     this.gun = new Gun(1000, 10000);
     this.health = 5;
+    this.despawn = false;
   }
 
   requestFire(targetX, targetY) {
@@ -20,10 +21,17 @@ class Enemy extends Entities {
   }
 
   update(friction, playerX, playerY) {
+    if (this.health <= 0) this.handleDespawn();
     super.update(friction);
     this.gun.update();
     this.requestFire(playerX, playerY);
+
+
     console.log(this.gun.bullets)
+  }
+
+  handleDespawn() {
+    this.despawn = true;
   }
 }
 
