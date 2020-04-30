@@ -1,8 +1,8 @@
 import Bullet from "./bullet";
 
 class Gun {
-  constructor(fireInterval, bulletExpireTime) {
-    this.fireInterval = fireInterval;
+  constructor(bulletExpireTime, calcFireInterval) {
+    this.calcFireInterval = calcFireInterval;
     this.bullets = [];
     this.bulletExpireTime = bulletExpireTime;
     this.firing = false;
@@ -14,7 +14,7 @@ class Gun {
       // debugger
       this.bullets.push(new Bullet(3, 3, this.bulletExpireTime, movement));
       this.firing = true;
-      window.setTimeout(() => (this.firing = false), this.fireInterval);
+      window.setTimeout(() => (this.firing = false), this.calcFireInterval());
     }
   }
 

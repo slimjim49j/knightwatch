@@ -14,6 +14,8 @@ class Game {
     this.bullets = [];
     this.enemies = [
       new Enemy(10, 10, { posX: 100, posY: 100, velX: 0, velY: 0 }),
+      new Enemy(10, 10, { posX: 200, posY: 200, velX: 0, velY: 0 }),
+      new Enemy(10, 10, { posX: 200, posY: 100, velX: 0, velY: 0 }),
     ];
 
     this.world = new World();
@@ -24,6 +26,8 @@ class Game {
   update(timeStamp) {
     this.bulletCollisionDetection();
     this.player.update(this.world.friction);
+
+
     this.enemies = this.enemies.filter(enemy => {
       enemy.update(
         this.world.friction,
@@ -45,12 +49,14 @@ class Game {
       }, this);
 
       // enemy bullet collision
-      this.player.gun.bullets.forEach(bullet => {
-        if (bullet.isColliding(enemy)) {
-          enemy.health -= bullet.damage;
-        }
-        console.log("enemy health:", enemy.health);
-      });
+      if (enemy.active) {
+        this.player.gun.bullets.forEach(bullet => {
+          if (bullet.isColliding(enemy)) {
+            enemy.health -= bullet.damage;
+          }
+          console.log("enemy health:", enemy.health);
+        });
+      }
     }, this);
   }
 

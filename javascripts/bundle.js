@@ -530,9 +530,15 @@ var Enemy = /*#__PURE__*/function (_Entities) {
     _classCallCheck(this, Enemy);
 
     _this = _super.call(this, width, height, movement);
-    _this.gun = new _gun__WEBPACK_IMPORTED_MODULE_1__["default"](1000, 10000);
+
+    var calcFireInterval = function calcFireInterval() {
+      return Math.random() * 3000 + 500;
+    };
+
+    _this.gun = new _gun__WEBPACK_IMPORTED_MODULE_1__["default"](10000, calcFireInterval);
     _this.health = 5;
     _this.despawn = false;
+    _this.active = true;
     return _this;
   }
 
@@ -552,13 +558,28 @@ var Enemy = /*#__PURE__*/function (_Entities) {
     }
   }, {
     key: "update",
-    value: function update(friction, playerX, playerY) {
-      if (this.health <= 0) this.handleDespawn();
+    value: function update(friction, targetX, targetY) {
+      if (this.health <= 0) this.active = false;
 
-      _get(_getPrototypeOf(Enemy.prototype), "update", this).call(this, friction);
+      if (this.active) {
+        var _this$movement2 = this.movement,
+            enemyX = _this$movement2.posX,
+            enemyY = _this$movement2.posY;
+        var angle = Math.atan2(targetY - enemyY, targetX - enemyX);
+        this.movement.velX = 2 * Math.cos(angle);
+        this.movement.velY = 2 * Math.sin(angle); // update position
+
+        _get(_getPrototypeOf(Enemy.prototype), "update", this).call(this, friction); // fire bulllet at target
+
+
+        this.requestFire(targetX, targetY);
+      } else {
+        // only actually despawn once all bullets have despawned
+        if (this.gun.bullets.length === 0) this.handleDespawn();
+      } // updates bullets
+
 
       this.gun.update();
-      this.requestFire(playerX, playerY);
       console.log(this.gun.bullets);
     }
   }, {
@@ -667,6 +688,16 @@ var Game = /*#__PURE__*/function () {
       posY: 100,
       velX: 0,
       velY: 0
+    }), new _enemy__WEBPACK_IMPORTED_MODULE_0__["default"](10, 10, {
+      posX: 200,
+      posY: 200,
+      velX: 0,
+      velY: 0
+    }), new _enemy__WEBPACK_IMPORTED_MODULE_0__["default"](10, 10, {
+      posX: 200,
+      posY: 100,
+      velX: 0,
+      velY: 0
     })];
     this.world = new _world__WEBPACK_IMPORTED_MODULE_2__["default"]();
     this.bulletCollisionDetection = this.bulletCollisionDetection.bind(this);
@@ -699,13 +730,15 @@ var Game = /*#__PURE__*/function () {
           console.log("player health:", _this2.player.health);
         }, _this2); // enemy bullet collision
 
-        _this2.player.gun.bullets.forEach(function (bullet) {
-          if (bullet.isColliding(enemy)) {
-            enemy.health -= bullet.damage;
-          }
+        if (enemy.active) {
+          _this2.player.gun.bullets.forEach(function (bullet) {
+            if (bullet.isColliding(enemy)) {
+              enemy.health -= bullet.damage;
+            }
 
-          console.log("enemy health:", enemy.health);
-        });
+            console.log("enemy health:", enemy.health);
+          });
+        }
       }, this);
     } // addBullet(bullet) {}
 
@@ -737,10 +770,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 var Gun = /*#__PURE__*/function () {
-  function Gun(fireInterval, bulletExpireTime) {
+  function Gun(bulletExpireTime, calcFireInterval) {
     _classCallCheck(this, Gun);
 
-    this.fireInterval = fireInterval;
+    this.calcFireInterval = calcFireInterval;
     this.bullets = [];
     this.bulletExpireTime = bulletExpireTime;
     this.firing = false;
@@ -757,7 +790,7 @@ var Gun = /*#__PURE__*/function () {
         this.firing = true;
         window.setTimeout(function () {
           return _this.firing = false;
-        }, this.fireInterval);
+        }, this.calcFireInterval());
       }
     }
   }, {
@@ -828,7 +861,9 @@ var Player = /*#__PURE__*/function (_Entities) {
     _classCallCheck(this, Player);
 
     _this = _super.call(this, width, height, movement);
-    _this.gun = new _gun__WEBPACK_IMPORTED_MODULE_1__["default"](300, 5000);
+    _this.gun = new _gun__WEBPACK_IMPORTED_MODULE_1__["default"](5000, function () {
+      return 300;
+    });
     _this.health = 7;
     return _this;
   }

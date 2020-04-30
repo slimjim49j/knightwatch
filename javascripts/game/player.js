@@ -4,7 +4,7 @@ import Gun from "./gun";
 class Player extends Entities {
   constructor(width, height, movement) {
     super(width, height, movement);
-    this.gun = new Gun(300, 5000);
+    this.gun = new Gun(5000, () => 300);
     this.health = 7;
   }
 
