@@ -1,5 +1,10 @@
-class Entities {
-  constructor(width, height, { posX, posY, velX, velY }) {
+import Animator from "./animator";
+
+class Entities extends Animator {
+  constructor(width, height, { posX, posY, velX, velY }, animatorParams) {
+    // debugger;
+    super(animatorParams);
+  
     this.movement = {
       posX: posX,
       posY: posY,
@@ -13,6 +18,8 @@ class Entities {
   }
 
   update(friction) {
+    super.update();
+    
     this.movement.velX *= friction;
     this.movement.velY *= friction;
 

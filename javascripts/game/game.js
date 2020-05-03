@@ -4,7 +4,7 @@ import World from "./world";
 
 class Game {
   constructor() {
-    this.player = new Player(10, 10, {
+    this.player = new Player(16, 22, {
       posX: 50,
       posY: 50,
       velX: 0,

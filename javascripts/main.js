@@ -9,41 +9,22 @@ const render = function() {
 
   // draw player
   const { posX: playerX, posY: playerY } = game.player.movement;
-  display.drawSquare({
-    x: playerX,
-    y: playerY,
-    width: game.player.height,
-    height: game.player.width
-  });
+  display.drawSquare({x: playerX, y: playerY, width: game.player.width, height: game.player.height})
+  display.drawObject(game.player.currentFrame, playerX, playerY);
 
   // draw enemies
   game.enemies.forEach(enemy => {
-    display.drawSquare({
-      x: enemy.movement.posX,
-      y: enemy.movement.posY,
-      width: enemy.height,
-      height: enemy.width,
-    });
+    display.drawObject(enemy.currentFrame, enemy.movement.posX, enemy.movement.posY);
   })
 
   // temp bullets
   game.player.gun.bullets.forEach(bullet => {
-    display.drawSquare({
-      x: bullet.movement.posX,
-      y: bullet.movement.posY,
-      width: bullet.height,
-      height: bullet.width
-    });
+    display.drawObject(bullet.currentFrame, bullet.movement.posX, bullet.movement.posY);
   });
 
   game.enemies.forEach(enemy => {
     enemy.gun.bullets.forEach(bullet => {
-      display.drawSquare({
-        x: bullet.movement.posX,
-        y: bullet.movement.posY,
-        width: bullet.height,
-        height: bullet.width,
-      });
+      display.drawObject(bullet.currentFrame, bullet.movement.posX, bullet.movement.posY);
     });
   })
 

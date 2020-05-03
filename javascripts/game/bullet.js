@@ -1,8 +1,10 @@
 import Entities from "./entities";
+import FrameManager from "./frame_manager";
 
 class Bullet extends Entities {
   constructor(width, height, expireTime, movement) {
-    super(width, height, movement);
+    const animatorParams = setupAnimatorParams();
+    super(width, height, movement, animatorParams);
     // this.spawnTime = spawnTime;
     // this.expirationTime = 5000;
     this.expired = false;
@@ -33,6 +35,25 @@ class Bullet extends Entities {
     }
     return false;
   }
+}
+
+function setupAnimatorParams() {
+  const frameManager = new FrameManager();
+  frameManager.setFrames("idle", [
+    {
+      x: 314,
+      y: 124,
+      width: 3,
+      height: 3,
+    }
+  ]);
+
+  return {
+    frameManager,
+    mode: "idle",
+    loop: false,
+    delay: null,
+  };
 }
 
 export default Bullet;

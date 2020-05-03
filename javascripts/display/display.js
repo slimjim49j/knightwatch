@@ -33,6 +33,54 @@ class Display {
     this.buffer.fillRect(Math.round(x), Math.round(y), width, height);
   }
 
+  drawObject(frame, destX, destY) {
+    // debugger
+    this.buffer.imageSmoothingEnabled = false;
+    if (frame.orientation === "right") {
+
+      this.buffer.drawImage(
+        this.tileSheet.image,
+        frame.x,
+        frame.y,
+        frame.width,
+        frame.height,
+        destX,
+        destY,
+        frame.width,
+        frame.height
+        );
+    } else {
+    
+        // move to x + img's width
+        // adding img.width is necessary because we're flipping from
+        //     the right side of the img so after flipping it's still
+        //     at [x,y]
+        this.buffer.translate(destX + frame.width, destY);
+
+        // scaleX by -1; this "trick" flips horizontally
+        this.buffer.scale(-1, 1);
+
+        // draw the img
+        // no need for x,y since we've already translated
+        this.buffer.drawImage(
+          this.tileSheet.image,
+          frame.x,
+          frame.y,
+          frame.width,
+          frame.height,
+          0,
+          0,
+          frame.width,
+          frame.height
+        );
+
+        // always clean up -- reset transformations to default
+        this.buffer.setTransform(1, 0, 0, 1, 0, 0);
+
+        // https://stackoverflow.com/questions/35973441/how-to-horizontally-flip-an-image
+    }
+  }
+
   drawMap(map) {
     const size = this.tileSheet.size;
     map.forEach((row, i) => {
