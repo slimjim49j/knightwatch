@@ -2,9 +2,10 @@ import Entities from "./entities";
 import FrameManager from "./frame_manager";
 
 class Bullet extends Entities {
-  constructor(width, height, expireTime, movement) {
+  constructor(width, height, expireTime, movement, angle) {
     const animatorParams = setupAnimatorParams();
     super(width, height, movement, animatorParams);
+    this.angle = angle;
     // this.spawnTime = spawnTime;
     // this.expirationTime = 5000;
     this.expired = false;
@@ -41,10 +42,10 @@ function setupAnimatorParams() {
   const frameManager = new FrameManager();
   frameManager.setFrames("idle", [
     {
-      x: 314,
-      y: 124,
-      width: 3,
-      height: 3,
+      x: 293,
+      y: 18,
+      width: 6,
+      height: 13,
     }
   ]);
 
@@ -53,6 +54,8 @@ function setupAnimatorParams() {
     mode: "idle",
     loop: false,
     delay: null,
+    offsetX: -1,
+    offsetY: -1,
   };
 }
 

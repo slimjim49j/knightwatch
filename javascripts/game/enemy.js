@@ -23,7 +23,7 @@ class Enemy extends Entities {
       posY: enemyY,
       velX: 5 * Math.cos(angle),
       velY: 5 * Math.sin(angle),
-    });
+    }, angle);
   }
 
   update(friction, targetX, targetY) {
@@ -128,6 +128,8 @@ function setupAnimatorParams() {
       mode: "idle",
       loop: true,
       delay: 5,
+      offsetX: -3,
+      offsetY: -5,
     }
   }
 

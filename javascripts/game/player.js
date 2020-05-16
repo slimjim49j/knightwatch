@@ -8,7 +8,8 @@ class Player extends Entities {
     super(width, height, movement, animatorParams);
     
     this.gun = new Gun(5000, () => 300);
-    this.health = 7;
+    this.health = 10;
+    this.maxHealth = 10;
   }
 
   requestFire(mouseX, mouseY) {
@@ -19,7 +20,7 @@ class Player extends Entities {
       posY: playerY,
       velX: 5 * Math.cos(angle),
       velY: 5 * Math.sin(angle),
-    });
+    }, angle);
   }
 
   update(friction) {
@@ -33,6 +34,17 @@ class Player extends Entities {
     const speed = Math.abs(this.movement.velX);
     if (speed > 1 && this.mode === "idle") this.changeMode("run", true);
     else if (speed < 1 && this.mode === "run") this.changeMode("idle", true);
+  }
+
+  // damage should always be greater than 0
+  damage(damageAmt) {
+    this.health -= damageAmt;
+    if (this.health < 0) this.health = 0;
+  }
+
+  heal(healAmt) {
+    this.health += healAmt;
+    if (this.health > this.maxHealth) this.health = this.maxHealth;
   }
 
   moveUp(vel) {
@@ -119,6 +131,8 @@ function setupAnimatorParams() {
       mode: "idle",
       loop: true,
       delay: 5,
+      offsetX: -5,
+      offsetY: -5,
     }
   }
 

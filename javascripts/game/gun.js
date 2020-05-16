@@ -9,10 +9,10 @@ class Gun {
 
   }
 
-  fire(movement) {
+  fire(movement, angle) {
     if (!this.firing) {
       // debugger
-      this.bullets.push(new Bullet(3, 3, this.bulletExpireTime, movement));
+      this.bullets.push(new Bullet(3, 3, this.bulletExpireTime, movement, angle));
       this.firing = true;
       window.setTimeout(() => (this.firing = false), this.calcFireInterval());
     }

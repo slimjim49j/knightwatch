@@ -178,6 +178,8 @@ Controller.ButtonInput = /*#__PURE__*/function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _tilesheet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./tilesheet */ "./javascripts/display/tilesheet.js");
+function _readOnlyError(name) { throw new Error("\"" + name + "\" is read-only"); }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -215,9 +217,10 @@ var Display = /*#__PURE__*/function () {
       var x = _ref.x,
           y = _ref.y,
           width = _ref.width,
-          height = _ref.height;
+          height = _ref.height,
+          color = _ref.color;
       // console.log(x, y);
-      this.buffer.fillStyle = "white";
+      this.buffer.fillStyle = color;
       this.buffer.fillRect(Math.round(x), Math.round(y), width, height);
     }
   }, {
@@ -244,6 +247,18 @@ var Display = /*#__PURE__*/function () {
       }
     }
   }, {
+    key: "drawRotatedObject",
+    value: function drawRotatedObject(frame, destX, destY, angle) {
+      // this.buffer.setTransform(scale, 0, 0, scale, x, y); // sets scale and origin
+      // debugger
+      this.buffer.imageSmoothingEnabled = false;
+      this.buffer.translate(destX, destY);
+      this.buffer.rotate(angle + Math.PI / 2);
+      this.buffer.drawImage(this.tileSheet.image, frame.x, frame.y, frame.width, frame.height, 0, 0, frame.width, frame.height); // this.buffer.rotate(-angle + (Math.PI / 2));
+
+      this.buffer.setTransform(1, 0, 0, 1, 0, 0);
+    }
+  }, {
     key: "drawMap",
     value: function drawMap(map) {
       var _this = this;
@@ -260,6 +275,28 @@ var Display = /*#__PURE__*/function () {
 
           _this.buffer.drawImage(_this.tileSheet.image, tileX, tileY, size, size, bufferX, bufferY, size, size);
         });
+      });
+    }
+  }, {
+    key: "drawHealth",
+    value: function drawHealth(worldWidth, worldHeight, health, maxHealth) {
+      var barWidth = worldWidth * 0.2;
+      if (barWidth < 30) barWidth = (_readOnlyError("barWidth"), 30);
+      if (barWidth > 300) barWidth = (_readOnlyError("barWidth"), 300);
+      var healthWidth = barWidth * health / maxHealth;
+      this.drawSquare({
+        x: 25,
+        y: worldHeight - 25,
+        width: barWidth,
+        height: 10,
+        color: "black"
+      });
+      this.drawSquare({
+        x: 25,
+        y: worldHeight - 25,
+        width: healthWidth,
+        height: 10,
+        color: "red"
       });
     }
   }, {
@@ -443,7 +480,9 @@ var Animator = /*#__PURE__*/function () {
     var frameManager = _ref.frameManager,
         mode = _ref.mode,
         loop = _ref.loop,
-        delay = _ref.delay;
+        delay = _ref.delay,
+        offsetX = _ref.offsetX,
+        offsetY = _ref.offsetY;
 
     _classCallCheck(this, Animator);
 
@@ -453,6 +492,8 @@ var Animator = /*#__PURE__*/function () {
     this.orientation = "left";
     this.mode = mode;
     this.loop = loop;
+    this.offsetX = offsetX;
+    this.offsetY = offsetY;
     this.engineFrameCount = 0;
     this.delay = delay;
   }
@@ -533,13 +574,14 @@ var Bullet = /*#__PURE__*/function (_Entities) {
 
   var _super = _createSuper(Bullet);
 
-  function Bullet(width, height, expireTime, movement) {
+  function Bullet(width, height, expireTime, movement, angle) {
     var _this;
 
     _classCallCheck(this, Bullet);
 
     var animatorParams = setupAnimatorParams();
-    _this = _super.call(this, width, height, movement, animatorParams); // this.spawnTime = spawnTime;
+    _this = _super.call(this, width, height, movement, animatorParams);
+    _this.angle = angle; // this.spawnTime = spawnTime;
     // this.expirationTime = 5000;
 
     _this.expired = false;
@@ -581,16 +623,18 @@ var Bullet = /*#__PURE__*/function (_Entities) {
 function setupAnimatorParams() {
   var frameManager = new _frame_manager__WEBPACK_IMPORTED_MODULE_1__["default"]();
   frameManager.setFrames("idle", [{
-    x: 314,
-    y: 124,
-    width: 3,
-    height: 3
+    x: 293,
+    y: 18,
+    width: 6,
+    height: 13
   }]);
   return {
     frameManager: frameManager,
     mode: "idle",
     loop: false,
-    delay: null
+    delay: null,
+    offsetX: -1,
+    offsetY: -1
   };
 }
 
@@ -676,7 +720,7 @@ var Enemy = /*#__PURE__*/function (_Entities) {
         posY: enemyY,
         velX: 5 * Math.cos(angle),
         velY: 5 * Math.sin(angle)
-      });
+      }, angle);
     }
   }, {
     key: "update",
@@ -775,7 +819,9 @@ function setupAnimatorParams() {
     frameManager: frameManager,
     mode: "idle",
     loop: true,
-    delay: 5
+    delay: 5,
+    offsetX: -3,
+    offsetY: -5
   };
 }
 
@@ -945,31 +991,18 @@ var Game = /*#__PURE__*/function () {
   function Game() {
     _classCallCheck(this, Game);
 
-    this.player = new _player__WEBPACK_IMPORTED_MODULE_1__["default"](16, 22, {
+    this.player = new _player__WEBPACK_IMPORTED_MODULE_1__["default"](8, 16, {
       posX: 50,
       posY: 50,
       velX: 0,
       velY: 0
     });
     this.bullets = [];
-    this.enemies = [new _enemy__WEBPACK_IMPORTED_MODULE_0__["default"](10, 10, {
-      posX: 100,
-      posY: 100,
-      velX: 0,
-      velY: 0
-    }), new _enemy__WEBPACK_IMPORTED_MODULE_0__["default"](10, 10, {
-      posX: 200,
-      posY: 200,
-      velX: 0,
-      velY: 0
-    }), new _enemy__WEBPACK_IMPORTED_MODULE_0__["default"](10, 10, {
-      posX: 200,
-      posY: 100,
-      velX: 0,
-      velY: 0
-    })];
+    this.enemies = [];
     this.world = new _world__WEBPACK_IMPORTED_MODULE_2__["default"]();
     this.bulletCollisionDetection = this.bulletCollisionDetection.bind(this);
+    this.waveInProgress = false;
+    this.difficulty = 0;
   }
 
   _createClass(Game, [{
@@ -982,7 +1015,9 @@ var Game = /*#__PURE__*/function () {
       this.enemies = this.enemies.filter(function (enemy) {
         enemy.update(_this.world.friction, _this.player.movement.posX, _this.player.movement.posY);
         return !enemy.despawn;
-      });
+      }); // manager updates after enemies
+
+      this.updateEnemyManager();
     }
   }, {
     key: "bulletCollisionDetection",
@@ -993,7 +1028,7 @@ var Game = /*#__PURE__*/function () {
         // player bullet collision
         enemy.gun.bullets.forEach(function (bullet) {
           if (bullet.isColliding(_this2.player)) {
-            _this2.player.health -= bullet.damage;
+            _this2.player.damage(bullet.damage);
           }
 
           console.log("player health:", _this2.player.health);
@@ -1009,8 +1044,35 @@ var Game = /*#__PURE__*/function () {
           });
         }
       }, this);
-    } // addBullet(bullet) {}
+    }
+  }, {
+    key: "updateEnemyManager",
+    value: function updateEnemyManager() {
+      var _this3 = this;
 
+      // console.log(this.difficulty);
+      if (!this.waveInProgress && this.enemies.length === 0) {
+        this.waveInProgress = true;
+        this.player.heal(2);
+        this.difficulty++;
+        var enemyCount = Math.round(5 * this.difficulty);
+        var intervalId = window.setInterval(function () {
+          if (enemyCount > 0) {
+            _this3.enemies.push(new _enemy__WEBPACK_IMPORTED_MODULE_0__["default"](10, 10, {
+              posX: Math.random() * _this3.world.width,
+              posY: Math.random() * _this3.world.height,
+              velX: 0,
+              velY: 0
+            }));
+
+            enemyCount--;
+          } else {
+            _this3.waveInProgress = false;
+            window.clearInterval(intervalId);
+          }
+        }, 2000 / this.difficulty);
+      }
+    }
   }]);
 
   return Game;
@@ -1050,12 +1112,12 @@ var Gun = /*#__PURE__*/function () {
 
   _createClass(Gun, [{
     key: "fire",
-    value: function fire(movement) {
+    value: function fire(movement, angle) {
       var _this = this;
 
       if (!this.firing) {
         // debugger
-        this.bullets.push(new _bullet__WEBPACK_IMPORTED_MODULE_0__["default"](3, 3, this.bulletExpireTime, movement));
+        this.bullets.push(new _bullet__WEBPACK_IMPORTED_MODULE_0__["default"](3, 3, this.bulletExpireTime, movement, angle));
         this.firing = true;
         window.setTimeout(function () {
           return _this.firing = false;
@@ -1136,7 +1198,8 @@ var Player = /*#__PURE__*/function (_Entities) {
     _this.gun = new _gun__WEBPACK_IMPORTED_MODULE_1__["default"](5000, function () {
       return 300;
     });
-    _this.health = 7;
+    _this.health = 10;
+    _this.maxHealth = 10;
     return _this;
   }
 
@@ -1152,7 +1215,7 @@ var Player = /*#__PURE__*/function (_Entities) {
         posY: playerY,
         velX: 5 * Math.cos(angle),
         velY: 5 * Math.sin(angle)
-      });
+      }, angle);
     }
   }, {
     key: "update",
@@ -1168,6 +1231,19 @@ var Player = /*#__PURE__*/function (_Entities) {
     value: function updateAnimationMode() {
       var speed = Math.abs(this.movement.velX);
       if (speed > 1 && this.mode === "idle") this.changeMode("run", true);else if (speed < 1 && this.mode === "run") this.changeMode("idle", true);
+    } // damage should always be greater than 0
+
+  }, {
+    key: "damage",
+    value: function damage(damageAmt) {
+      this.health -= damageAmt;
+      if (this.health < 0) this.health = 0;
+    }
+  }, {
+    key: "heal",
+    value: function heal(healAmt) {
+      this.health += healAmt;
+      if (this.health > this.maxHealth) this.health = this.maxHealth;
     }
   }, {
     key: "moveUp",
@@ -1244,7 +1320,9 @@ function setupAnimatorParams() {
     frameManager: frameManager,
     mode: "idle",
     loop: true,
-    delay: 5
+    delay: 5,
+    offsetX: -5,
+    offsetY: -5
   };
 }
 
@@ -1308,22 +1386,32 @@ var render = function render() {
     x: playerX,
     y: playerY,
     width: game.player.width,
-    height: game.player.height
+    height: game.player.height,
+    color: "green"
   });
-  display.drawObject(game.player.currentFrame, playerX, playerY); // draw enemies
+  display.drawObject(game.player.currentFrame, playerX + game.player.offsetX, playerY + game.player.offsetY); // draw enemies
 
   game.enemies.forEach(function (enemy) {
-    display.drawObject(enemy.currentFrame, enemy.movement.posX, enemy.movement.posY);
+    display.drawSquare({
+      x: enemy.movement.posX,
+      y: enemy.movement.posY,
+      width: enemy.width,
+      height: enemy.height,
+      color: "green"
+    });
+    display.drawObject(enemy.currentFrame, enemy.movement.posX + enemy.offsetX, enemy.movement.posY + enemy.offsetY);
   }); // temp bullets
 
   game.player.gun.bullets.forEach(function (bullet) {
-    display.drawObject(bullet.currentFrame, bullet.movement.posX, bullet.movement.posY);
+    display.drawRotatedObject(bullet.currentFrame, bullet.movement.posX, bullet.movement.posY, bullet.angle);
   });
   game.enemies.forEach(function (enemy) {
     enemy.gun.bullets.forEach(function (bullet) {
-      display.drawObject(bullet.currentFrame, bullet.movement.posX, bullet.movement.posY);
+      display.drawRotatedObject(bullet.currentFrame, bullet.movement.posX, bullet.movement.posY, bullet.angle);
     });
-  });
+  }); // ui
+
+  display.drawHealth(game.world.width, game.world.height, game.player.health, game.player.maxHealth);
   display.render();
 };
 

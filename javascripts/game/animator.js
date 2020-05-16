@@ -7,13 +7,16 @@
     then the next sprite in the sequence is selected from the frameManager
 */
 class Animator {
-    constructor({frameManager, mode, loop, delay}) {
+    constructor({frameManager, mode, loop, delay, offsetX, offsetY}) {
         this.frameManager = frameManager;
         this.currentFrame;
         this.currentFrameIdx = 0;
         this.orientation = "left";
         this.mode = mode;
         this.loop = loop;
+
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
 
         this.engineFrameCount = 0;
         this.delay = delay;

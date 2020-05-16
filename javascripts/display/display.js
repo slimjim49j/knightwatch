@@ -27,9 +27,9 @@ class Display {
     );
   }
 
-  drawSquare({ x, y, width, height }) {
+  drawSquare({ x, y, width, height, color }) {
     // console.log(x, y);
-    this.buffer.fillStyle = "white";
+    this.buffer.fillStyle = color;
     this.buffer.fillRect(Math.round(x), Math.round(y), width, height);
   }
 
@@ -81,6 +81,27 @@ class Display {
     }
   }
 
+  drawRotatedObject(frame, destX, destY, angle) {
+    // this.buffer.setTransform(scale, 0, 0, scale, x, y); // sets scale and origin
+    // debugger
+    this.buffer.imageSmoothingEnabled = false;
+    this.buffer.translate(destX, destY);
+    this.buffer.rotate(angle + (Math.PI / 2));
+    this.buffer.drawImage(
+      this.tileSheet.image,
+      frame.x,
+      frame.y,
+      frame.width,
+      frame.height,
+      0,
+      0,
+      frame.width,
+      frame.height);
+
+    // this.buffer.rotate(-angle + (Math.PI / 2));
+    this.buffer.setTransform(1, 0, 0, 1, 0, 0);
+  }
+
   drawMap(map) {
     const size = this.tileSheet.size;
     map.forEach((row, i) => {
@@ -105,6 +126,16 @@ class Display {
         );
       });
     });
+  }
+
+  drawHealth(worldWidth, worldHeight, health, maxHealth) {
+    const barWidth = worldWidth * 0.2;
+    if (barWidth < 30) barWidth = 30;
+    if (barWidth > 300) barWidth = 300;
+    
+    const healthWidth = barWidth * health / maxHealth;
+    this.drawSquare({x: 25, y: worldHeight - 25, width: barWidth, height: 10, color: "black"})
+    this.drawSquare({x: 25, y: worldHeight - 25, width: healthWidth, height: 10, color: "red"})
   }
 
   render() {

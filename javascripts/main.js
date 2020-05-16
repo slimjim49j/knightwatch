@@ -9,25 +9,39 @@ const render = function() {
 
   // draw player
   const { posX: playerX, posY: playerY } = game.player.movement;
-  display.drawSquare({x: playerX, y: playerY, width: game.player.width, height: game.player.height})
-  display.drawObject(game.player.currentFrame, playerX, playerY);
+  display.drawSquare({x: playerX, y: playerY, width: game.player.width, height: game.player.height, color: "green" })
+  display.drawObject(game.player.currentFrame, playerX + game.player.offsetX, playerY + game.player.offsetY);
 
   // draw enemies
   game.enemies.forEach(enemy => {
-    display.drawObject(enemy.currentFrame, enemy.movement.posX, enemy.movement.posY);
+    display.drawSquare({ x: enemy.movement.posX, y: enemy.movement.posY, width: enemy.width, height: enemy.height, color: "green" })
+    display.drawObject(
+      enemy.currentFrame,
+      enemy.movement.posX + enemy.offsetX,
+      enemy.movement.posY + enemy.offsetY
+    );
   })
 
   // temp bullets
   game.player.gun.bullets.forEach(bullet => {
-    display.drawObject(bullet.currentFrame, bullet.movement.posX, bullet.movement.posY);
+    display.drawRotatedObject(
+      bullet.currentFrame,
+      bullet.movement.posX, bullet.movement.posY,
+      bullet.angle
+    );
   });
 
   game.enemies.forEach(enemy => {
     enemy.gun.bullets.forEach(bullet => {
-      display.drawObject(bullet.currentFrame, bullet.movement.posX, bullet.movement.posY);
+      display.drawRotatedObject(bullet.currentFrame, bullet.movement.posX, bullet.movement.posY, bullet.angle);
     });
   })
 
+
+  
+  // ui
+  display.drawHealth(game.world.width, game.world.height, game.player.health, game.player.maxHealth)
+  
   display.render();
 };
 
