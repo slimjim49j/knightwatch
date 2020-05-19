@@ -1010,23 +1010,34 @@ var Game = /*#__PURE__*/function () {
     value: function update(timeStamp) {
       var _this = this;
 
-      this.bulletCollisionDetection();
       this.player.update(this.world.friction);
+      this.world.handleCollision(this.player);
       this.enemies = this.enemies.filter(function (enemy) {
         enemy.update(_this.world.friction, _this.player.movement.posX, _this.player.movement.posY);
+
+        _this.world.handleCollision(enemy);
+
         return !enemy.despawn;
       }); // manager updates after enemies
 
-      this.updateEnemyManager();
+      this.updateEnemyManager(); // not entirely sure where this should be relative to other updates
+      // I'm moving it down here from all the way up top so wall collision detection can happen after movement
+
+      this.bulletCollisionDetection();
     }
   }, {
     key: "bulletCollisionDetection",
     value: function bulletCollisionDetection() {
       var _this2 = this;
 
+      this.player.gun.bullets.forEach(function (bullet) {
+        _this2.world.handleCollision(bullet);
+      });
       this.enemies.forEach(function (enemy) {
         // player bullet collision
         enemy.gun.bullets.forEach(function (bullet) {
+          _this2.world.handleCollision(bullet);
+
           if (bullet.isColliding(_this2.player)) {
             _this2.player.damage(bullet.damage);
           }
@@ -1339,19 +1350,178 @@ function setupAnimatorParams() {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _bullet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./bullet */ "./javascripts/game/bullet.js");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var World = function World() {
-  _classCallCheck(this, World);
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-  this.cols = 24;
-  this.rows = 18;
-  this.size = 16;
-  this.height = this.rows * this.size;
-  this.width = this.cols * this.size;
-  this.friction = 0.85;
-  this.map = [[224, 1, 2, 3, 2, 1, 3, 3, 1, 2, 3, 2, 1, 1, 3, 2, 1, 3, 2, 2, 3, 1, 1, 225], [256, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257]];
-};
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+var World = /*#__PURE__*/function () {
+  function World() {
+    _classCallCheck(this, World);
+
+    this.cols = 24;
+    this.rows = 18;
+    this.size = 16;
+    this.height = this.rows * this.size;
+    this.width = this.cols * this.size;
+    this.friction = 0.85;
+    this.map = [[224, 1, 2, 3, 2, 1, 3, 3, 1, 2, 3, 2, 1, 1, 3, 2, 1, 3, 2, 2, 3, 1, 1, 225], [256, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257], [256, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 129, 257]];
+    /*
+    0: no collision
+    1: top
+    2: right
+    3: bottom
+    4: left
+    */
+
+    this.collisionMap = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4], [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4], [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4], [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4], [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4], [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4], [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4], [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4], [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4], [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4], [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4], [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4], [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4], [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4], [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4], [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4], [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4]];
+  } // detect collision
+  // find position of obj on collision map
+  // find all relative collision tiles
+  // test for collision on all relavent collision tiles
+  // parse what collision each tile checks for
+  // resolve collision
+  // move obj on colliding tiles
+
+
+  _createClass(World, [{
+    key: "handleCollision",
+    value: function handleCollision(obj) {
+      var _this = this;
+
+      var collisionTiles = this.findCollisionTiles(obj); // return arr of tuples containing tile coords ([row, col])
+
+      if (collisionTiles) {
+        collisionTiles.forEach(function (tileTuple) {
+          _this.resolveCollision.apply(_this, [obj].concat(_toConsumableArray(tileTuple)));
+        });
+      }
+    } // return arr of tiles to check
+
+  }, {
+    key: "findCollisionTiles",
+    value: function findCollisionTiles(obj) {
+      return [this.convertPosToTile(obj.movement.posX, obj.movement.posY), this.convertPosToTile(obj.movement.posX + obj.width, obj.movement.posY), this.convertPosToTile(obj.movement.posX, obj.movement.posY + obj.height), this.convertPosToTile(obj.movement.posX + obj.width, obj.movement.posY + obj.height)];
+    }
+  }, {
+    key: "convertPosToTile",
+    value: function convertPosToTile(posX, posY) {
+      var row = Math.floor(posY / this.size);
+      var col = Math.floor(posX / this.size);
+      return [row, col];
+    } // currently returns collision val (int)
+
+  }, {
+    key: "getCollisionTile",
+    value: function getCollisionTile(row, col) {
+      // debugger
+      return this.collisionMap[row][col];
+    }
+  }, {
+    key: "resolveCollision",
+    value: function resolveCollision(obj, row, col) {
+      var collisionValue = this.getCollisionTile(row, col);
+      var didCollide;
+
+      switch (collisionValue) {
+        case 1:
+          didCollide = this.checkTop(obj, row);
+          break;
+
+        case 2:
+          didCollide = this.checkRight(obj, col);
+          break;
+
+        case 3:
+          didCollide = this.checkBottom(obj, row);
+          break;
+
+        case 4:
+          didCollide = this.checkLeft(obj, col);
+          break;
+
+        default:
+          didCollide = false;
+          break;
+      }
+
+      if (didCollide && obj instanceof _bullet__WEBPACK_IMPORTED_MODULE_0__["default"]) {
+        obj.movement.velX = 0;
+        obj.movement.velY = 0;
+      }
+    }
+  }, {
+    key: "checkTop",
+    value: function checkTop(obj, row) {
+      var tileY = row * this.size;
+
+      if (obj.movement.posY + obj.height > tileY) {
+        obj.movement.posY = tileY - obj.height;
+        obj.movement.velY = 0;
+        return true;
+      }
+
+      return false;
+    }
+  }, {
+    key: "checkRight",
+    value: function checkRight(obj, col) {
+      var tileX = (col + 1) * this.size;
+
+      if (obj.movement.posX < tileX) {
+        obj.movement.posX = tileX;
+        obj.movement.velX = 0;
+        return true;
+      }
+
+      return false;
+    }
+  }, {
+    key: "checkBottom",
+    value: function checkBottom(obj, row) {
+      var tileY = (row + 1) * this.size;
+
+      if (obj.movement.posY < tileY) {
+        obj.movement.posY = tileY;
+        obj.movement.velY = 0;
+        return true;
+      }
+
+      return false;
+    }
+  }, {
+    key: "checkLeft",
+    value: function checkLeft(obj, col) {
+      var tileX = col * this.size;
+
+      if (obj.movement.posX + obj.width > tileX) {
+        obj.movement.posX = tileX - obj.width;
+        obj.movement.velX = 0;
+        return true;
+      }
+
+      return false;
+    }
+  }]);
+
+  return World;
+}();
 
 /* harmony default export */ __webpack_exports__["default"] = (World);
 
@@ -1377,7 +1547,29 @@ __webpack_require__.r(__webpack_exports__);
 
 var render = function render() {
   display.renderColor("#000000");
-  display.drawMap(game.world.map); // draw player
+  display.drawMap(game.world.map); // draw enemies
+
+  game.enemies.forEach(function (enemy) {
+    if (enemy.active) {
+      display.drawSquare({
+        x: enemy.movement.posX,
+        y: enemy.movement.posY,
+        width: enemy.width,
+        height: enemy.height,
+        color: "pink"
+      });
+      display.drawObject(enemy.currentFrame, enemy.movement.posX + enemy.offsetX, enemy.movement.posY + enemy.offsetY);
+    } else {
+      display.drawRotatedObject(enemy.currentFrame, enemy.movement.posX, enemy.movement.posY, 60);
+      display.drawSquare({
+        x: enemy.movement.posX,
+        y: enemy.movement.posY,
+        width: enemy.width,
+        height: enemy.height,
+        color: "#00000099"
+      });
+    }
+  }); // draw player
 
   var _game$player$movement = game.player.movement,
       playerX = _game$player$movement.posX,
@@ -1387,26 +1579,29 @@ var render = function render() {
     y: playerY,
     width: game.player.width,
     height: game.player.height,
-    color: "green"
+    color: "pink"
   });
-  display.drawObject(game.player.currentFrame, playerX + game.player.offsetX, playerY + game.player.offsetY); // draw enemies
-
-  game.enemies.forEach(function (enemy) {
-    display.drawSquare({
-      x: enemy.movement.posX,
-      y: enemy.movement.posY,
-      width: enemy.width,
-      height: enemy.height,
-      color: "green"
-    });
-    display.drawObject(enemy.currentFrame, enemy.movement.posX + enemy.offsetX, enemy.movement.posY + enemy.offsetY);
-  }); // temp bullets
+  display.drawObject(game.player.currentFrame, playerX + game.player.offsetX, playerY + game.player.offsetY); // temp bullets
 
   game.player.gun.bullets.forEach(function (bullet) {
+    display.drawSquare({
+      x: bullet.movement.posX,
+      y: bullet.movement.posY,
+      width: bullet.width,
+      height: bullet.height,
+      color: "pink"
+    });
     display.drawRotatedObject(bullet.currentFrame, bullet.movement.posX, bullet.movement.posY, bullet.angle);
   });
   game.enemies.forEach(function (enemy) {
     enemy.gun.bullets.forEach(function (bullet) {
+      display.drawSquare({
+        x: bullet.movement.posX,
+        y: bullet.movement.posY,
+        width: bullet.width,
+        height: bullet.height,
+        color: "pink"
+      });
       display.drawRotatedObject(bullet.currentFrame, bullet.movement.posX, bullet.movement.posY, bullet.angle);
     });
   }); // ui
@@ -1455,6 +1650,9 @@ window.addEventListener("click", handleClick);
 display.tileSheet.image.addEventListener("load", function () {
   display.handleResize(document.documentElement.clientWidth - 32, document.documentElement.clientHeight - 32, game.world.height / game.world.width);
   engine.start();
+  window.setTimeout(function () {
+    return engine.stop();
+  }, 1000);
 });
 display.tileSheet.loadImage();
 

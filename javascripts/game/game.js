@@ -23,27 +23,37 @@ class Game {
   }
 
   update(timeStamp) {
-    this.bulletCollisionDetection();
     this.player.update(this.world.friction);
-
-
+    this.world.handleCollision(this.player);
+    
     this.enemies = this.enemies.filter(enemy => {
       enemy.update(
         this.world.friction,
         this.player.movement.posX,
         this.player.movement.posY
       )
+      this.world.handleCollision(enemy);
       return !enemy.despawn;
     });
-
+    
     // manager updates after enemies
     this.updateEnemyManager();
+
+    // not entirely sure where this should be relative to other updates
+    // I'm moving it down here from all the way up top so wall collision detection can happen after movement
+    this.bulletCollisionDetection();
   }
 
   bulletCollisionDetection() {
+    this.player.gun.bullets.forEach(bullet => {
+      this.world.handleCollision(bullet);
+    });
+    
     this.enemies.forEach(enemy => {
       // player bullet collision
       enemy.gun.bullets.forEach(bullet => {
+        this.world.handleCollision(bullet);
+        
         if (bullet.isColliding(this.player)) {
           this.player.damage(bullet.damage);
         }

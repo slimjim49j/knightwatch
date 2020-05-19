@@ -6,24 +6,35 @@ import Game from "./game/game";
 const render = function() {
   display.renderColor("#000000");
   display.drawMap(game.world.map);
-
-  // draw player
-  const { posX: playerX, posY: playerY } = game.player.movement;
-  display.drawSquare({x: playerX, y: playerY, width: game.player.width, height: game.player.height, color: "green" })
-  display.drawObject(game.player.currentFrame, playerX + game.player.offsetX, playerY + game.player.offsetY);
-
+  
   // draw enemies
   game.enemies.forEach(enemy => {
-    display.drawSquare({ x: enemy.movement.posX, y: enemy.movement.posY, width: enemy.width, height: enemy.height, color: "green" })
-    display.drawObject(
-      enemy.currentFrame,
-      enemy.movement.posX + enemy.offsetX,
-      enemy.movement.posY + enemy.offsetY
-    );
-  })
+    if (enemy.active) {
+      display.drawSquare({ x: enemy.movement.posX, y: enemy.movement.posY, width: enemy.width, height: enemy.height, color: "pink" })
+      display.drawObject(
+        enemy.currentFrame,
+        enemy.movement.posX + enemy.offsetX,
+        enemy.movement.posY + enemy.offsetY
+      );
+    } else {
+      display.drawRotatedObject(
+        enemy.currentFrame,
+        enemy.movement.posX,
+        enemy.movement.posY,
+        60
+      );
+      display.drawSquare({ x: enemy.movement.posX, y: enemy.movement.posY, width: enemy.width, height: enemy.height, color: "#00000099" });
+    }
+  });
+    
+  // draw player
+  const { posX: playerX, posY: playerY } = game.player.movement;
+  display.drawSquare({x: playerX, y: playerY, width: game.player.width, height: game.player.height, color: "pink" });
+  display.drawObject(game.player.currentFrame, playerX + game.player.offsetX, playerY + game.player.offsetY);
 
   // temp bullets
   game.player.gun.bullets.forEach(bullet => {
+    display.drawSquare({ x: bullet.movement.posX, y: bullet.movement.posY, width: bullet.width, height: bullet.height, color: "pink" })
     display.drawRotatedObject(
       bullet.currentFrame,
       bullet.movement.posX, bullet.movement.posY,
@@ -33,6 +44,7 @@ const render = function() {
 
   game.enemies.forEach(enemy => {
     enemy.gun.bullets.forEach(bullet => {
+      display.drawSquare({ x: bullet.movement.posX, y: bullet.movement.posY, width: bullet.width, height: bullet.height, color: "pink" })
       display.drawRotatedObject(bullet.currentFrame, bullet.movement.posX, bullet.movement.posY, bullet.angle);
     });
   })
@@ -96,6 +108,7 @@ display.tileSheet.image.addEventListener("load", () => {
     game.world.height / game.world.width
   );
   engine.start();
+  window.setTimeout(() => engine.stop(), 1000)
 });
 
 display.tileSheet.loadImage();
