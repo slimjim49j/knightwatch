@@ -544,6 +544,7 @@ var Animator = /*#__PURE__*/function () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _entities__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./entities */ "./javascripts/game/entities.js");
 /* harmony import */ var _frame_manager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./frame_manager */ "./javascripts/game/frame_manager.js");
+/* harmony import */ var _util_timers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/timers */ "./javascripts/util/timers.js");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -569,6 +570,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
 var Bullet = /*#__PURE__*/function (_Entities) {
   _inherits(Bullet, _Entities);
 
@@ -585,7 +587,7 @@ var Bullet = /*#__PURE__*/function (_Entities) {
     // this.expirationTime = 5000;
 
     _this.expired = false;
-    window.setTimeout(function () {
+    _this.expirationTimer = new _util_timers__WEBPACK_IMPORTED_MODULE_2__["Timer"](function () {
       return _this.expired = true;
     }, expireTime);
     _this.damage = 2;
@@ -977,11 +979,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _enemy__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./enemy */ "./javascripts/game/enemy.js");
 /* harmony import */ var _player__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./player */ "./javascripts/game/player.js");
 /* harmony import */ var _world__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./world */ "./javascripts/game/world.js");
+/* harmony import */ var _util_timers__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../util/timers */ "./javascripts/util/timers.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 
 
 
@@ -1067,7 +1071,8 @@ var Game = /*#__PURE__*/function () {
         this.player.heal(2);
         this.difficulty++;
         var enemyCount = Math.round(5 * this.difficulty);
-        var intervalId = window.setInterval(function () {
+        if (this.interval instanceof _util_timers__WEBPACK_IMPORTED_MODULE_3__["IntervalTimer"]) this.interval.pause();
+        this.interval = new _util_timers__WEBPACK_IMPORTED_MODULE_3__["IntervalTimer"](function () {
           if (enemyCount > 0) {
             _this3.enemies.push(new _enemy__WEBPACK_IMPORTED_MODULE_0__["default"](10, 10, {
               posX: Math.random() * _this3.world.width,
@@ -1078,8 +1083,7 @@ var Game = /*#__PURE__*/function () {
 
             enemyCount--;
           } else {
-            _this3.waveInProgress = false;
-            window.clearInterval(intervalId);
+            _this3.waveInProgress = false; // window.clearInterval(this.interval);
           }
         }, 2000 / this.difficulty);
       }
@@ -1103,11 +1107,13 @@ var Game = /*#__PURE__*/function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _bullet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./bullet */ "./javascripts/game/bullet.js");
+/* harmony import */ var _util_timers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/timers */ "./javascripts/util/timers.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 
 
 
@@ -1130,7 +1136,7 @@ var Gun = /*#__PURE__*/function () {
         // debugger
         this.bullets.push(new _bullet__WEBPACK_IMPORTED_MODULE_0__["default"](3, 3, this.bulletExpireTime, movement, angle));
         this.firing = true;
-        window.setTimeout(function () {
+        this.allowFire = new _util_timers__WEBPACK_IMPORTED_MODULE_1__["Timer"](function () {
           return _this.firing = false;
         }, this.calcFireInterval());
       }
@@ -1646,15 +1652,139 @@ var handleClick = function handleClick(e) {
 window.addEventListener("resize", handleResize);
 window.addEventListener("keydown", handleKeyChange);
 window.addEventListener("keyup", handleKeyChange);
-window.addEventListener("click", handleClick);
+window.addEventListener("click", handleClick); // handle start / stop game play
+
+var imgLoaded = false;
 display.tileSheet.image.addEventListener("load", function () {
   display.handleResize(document.documentElement.clientWidth - 32, document.documentElement.clientHeight - 32, game.world.height / game.world.width);
-  engine.start();
-  window.setTimeout(function () {
-    return engine.stop();
-  }, 1000);
+  imgLoaded = true; // engine.start();
+  // window.setTimeout(() => engine.stop(), 1000)
 });
+var play = false;
+var playToggleCheckbox = document.querySelector(".play-toggle-label input");
+var playToggleSpan = document.querySelector(".play-toggle-label span");
+playToggleCheckbox.addEventListener("change", function (e) {
+  e.stopPropagation();
+  play = !play;
+
+  if (imgLoaded && play) {
+    resumeActivity();
+    playToggleSpan.textContent = "Pause";
+  } else {
+    pauseActivity();
+    playToggleSpan.textContent = "Play";
+  }
+}); // guns, bullets, enemy manager
+
+function resumeActivity() {
+  engine.start(); // resume bullet expiration
+
+  game.player.gun.bullets.forEach(function (bullet) {
+    return bullet.expirationTimer.resume();
+  });
+  game.enemies.forEach(function (enemy) {
+    return enemy.gun.bullets.forEach(function (bullet) {
+      return bullet.expirationTimer.resume();
+    });
+  }); // resume gun cooldown
+
+  if (game.player.gun.allowFire) game.player.gun.allowFire.resume();
+  game.enemies.forEach(function (enemy) {
+    if (enemy.gun.allowFire) enemy.gun.allowFire.resume();
+  }); // resume enemy manager
+
+  if (game.interval) game.interval.resume();
+}
+
+function pauseActivity() {
+  engine.stop(); // pause bullet expiration
+
+  game.player.gun.bullets.forEach(function (bullet) {
+    return bullet.expirationTimer.pause();
+  });
+  game.enemies.forEach(function (enemy) {
+    return enemy.gun.bullets.forEach(function (bullet) {
+      return bullet.expirationTimer.pause();
+    });
+  }); // pause gun cooldown
+
+  if (game.player.gun.allowFire) game.player.gun.allowFire.pause();
+  game.enemies.forEach(function (enemy) {
+    if (enemy.gun.allowFire) enemy.gun.allowFire.pause();
+  }); // pause enemy manager
+
+  game.interval.pause();
+}
+
 display.tileSheet.loadImage();
+
+/***/ }),
+
+/***/ "./javascripts/util/timers.js":
+/*!************************************!*\
+  !*** ./javascripts/util/timers.js ***!
+  \************************************/
+/*! exports provided: Timer, IntervalTimer */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Timer", function() { return Timer; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "IntervalTimer", function() { return IntervalTimer; });
+// https://stackoverflow.com/a/3969760/8896999
+var Timer = function Timer(callback, delay) {
+  var timerId,
+      start,
+      remaining = delay;
+
+  this.pause = function () {
+    window.clearTimeout(timerId);
+    remaining -= Date.now() - start;
+  };
+
+  this.resume = function () {
+    start = Date.now();
+    window.clearTimeout(timerId);
+    timerId = window.setTimeout(callback, remaining);
+  };
+
+  this.resume();
+}; // https://stackoverflow.com/a/24725066/8896999
+
+
+function IntervalTimer(callback, interval) {
+  var timerId,
+      startTime,
+      remaining = 0;
+  var state = 0; //  0 = idle, 1 = running, 2 = paused, 3= resumed
+
+  this.pause = function () {
+    if (state != 1) return;
+    remaining = interval - (new Date() - startTime);
+    window.clearInterval(timerId);
+    state = 2;
+  };
+
+  this.resume = function () {
+    if (state != 2) return;
+    state = 3;
+    window.setTimeout(this.timeoutCallback, remaining);
+  };
+
+  this.timeoutCallback = function () {
+    if (state != 3) return;
+    callback();
+    startTime = new Date();
+    timerId = window.setInterval(callback, interval);
+    state = 1;
+  };
+
+  startTime = new Date();
+  timerId = window.setInterval(callback, interval);
+  state = 1;
+}
+
+
 
 /***/ })
 

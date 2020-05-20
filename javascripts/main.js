@@ -101,14 +101,74 @@ window.addEventListener("keydown", handleKeyChange);
 window.addEventListener("keyup", handleKeyChange);
 window.addEventListener("click", handleClick);
 
+// handle start / stop game play
+
+let imgLoaded = false;
 display.tileSheet.image.addEventListener("load", () => {
   display.handleResize(
     document.documentElement.clientWidth - 32,
     document.documentElement.clientHeight - 32,
     game.world.height / game.world.width
   );
-  engine.start();
-  window.setTimeout(() => engine.stop(), 1000)
+  imgLoaded = true;
+  // engine.start();
+  // window.setTimeout(() => engine.stop(), 1000)
 });
+
+let play = false;
+const playToggleCheckbox = document.querySelector(".play-toggle-label input");
+const playToggleSpan = document.querySelector(".play-toggle-label span");
+playToggleCheckbox.addEventListener("change", (e) => {
+  e.stopPropagation();
+  play = !play;
+  if (imgLoaded && play) {
+    
+    resumeActivity();
+    playToggleSpan.textContent = "Pause"
+  } else {
+    
+    pauseActivity();
+    playToggleSpan.textContent = "Play"
+  }
+});
+
+// guns, bullets, enemy manager
+function resumeActivity() {
+  engine.start();
+
+  // resume bullet expiration
+  game.player.gun.bullets.forEach(bullet => bullet.expirationTimer.resume());
+  game.enemies.forEach(enemy => (
+    enemy.gun.bullets.forEach(bullet => bullet.expirationTimer.resume())
+  ));
+
+  // resume gun cooldown
+  if (game.player.gun.allowFire) game.player.gun.allowFire.resume();
+  game.enemies.forEach(enemy => {
+    if (enemy.gun.allowFire) enemy.gun.allowFire.resume();
+  });
+  
+  // resume enemy manager
+  if (game.interval) game.interval.resume();
+}
+
+function pauseActivity() {
+  engine.stop();
+
+  // pause bullet expiration
+  game.player.gun.bullets.forEach(bullet => bullet.expirationTimer.pause());
+  game.enemies.forEach(enemy => (
+    enemy.gun.bullets.forEach(bullet => bullet.expirationTimer.pause())
+  ));
+
+  // pause gun cooldown
+  if (game.player.gun.allowFire) game.player.gun.allowFire.pause();
+  game.enemies.forEach(enemy => {
+    if (enemy.gun.allowFire) enemy.gun.allowFire.pause();
+  });
+
+  // pause enemy manager
+  game.interval.pause();
+}
 
 display.tileSheet.loadImage();

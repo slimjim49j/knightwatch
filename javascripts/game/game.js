@@ -1,6 +1,7 @@
 import Enemy from "./enemy";
 import Player from "./player";
 import World from "./world";
+import { IntervalTimer } from "../util/timers";
 
 class Game {
   constructor() {
@@ -80,7 +81,9 @@ class Game {
       
       this.difficulty++;
       let enemyCount = Math.round(5 * this.difficulty);
-      const intervalId = window.setInterval(() => {
+
+      if (this.interval instanceof IntervalTimer) this.interval.pause();
+      this.interval = new IntervalTimer(() => {
         if (enemyCount > 0) {
           this.enemies.push(
             new Enemy(
@@ -96,7 +99,7 @@ class Game {
           enemyCount--;
         } else {
           this.waveInProgress = false;
-          window.clearInterval(intervalId);
+          // window.clearInterval(this.interval);
         }
       }, 2000 / this.difficulty);
     }

@@ -1,5 +1,6 @@
 import Entities from "./entities";
 import FrameManager from "./frame_manager";
+import { Timer } from "../util/timers";
 
 class Bullet extends Entities {
   constructor(width, height, expireTime, movement, angle) {
@@ -9,7 +10,7 @@ class Bullet extends Entities {
     // this.spawnTime = spawnTime;
     // this.expirationTime = 5000;
     this.expired = false;
-    window.setTimeout(() => (this.expired = true), expireTime);
+    this.expirationTimer = new Timer(() => (this.expired = true), expireTime);
     this.damage = 2;
   }
 

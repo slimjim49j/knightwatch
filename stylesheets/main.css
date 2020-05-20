@@ -72,10 +72,29 @@ h1 {
 
 
 
-.instructions {
-    /* padding-left: 25px; */
+
+/*  CANVAS   */
+.canvas-wrapper {
+    position: relative;
 }
 
+.play-toggle-label {
+    position: absolute;
+    background-color: transparent;
+    font-size: 25px;
+    
+    border: none;
+}
+
+.play-toggle-label input {
+    height: 0;
+    width: 0;
+    opacity: 0;
+}
+
+
+
+/*   INSTRUCTIONS  */
 .instructions h2 {
     font-size: 45px;
     text-align: center;
