@@ -55,8 +55,8 @@ function setupAnimatorParams() {
     mode: "idle",
     loop: false,
     delay: null,
-    offsetX: -1,
-    offsetY: -1,
+    offsetX: 0,
+    offsetY: 0,
   };
 }
 

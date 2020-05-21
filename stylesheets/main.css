@@ -78,18 +78,27 @@ h1 {
     position: relative;
 }
 
-.play-toggle-label {
+.game-info-header {
     position: absolute;
-    background-color: transparent;
+    top: 16px;
+    left: 48px;
     font-size: 25px;
+}
+
+.play-toggle-label {
+    background-color: transparent;
     
     border: none;
+
+    cursor: pointer;
 }
 
 .play-toggle-label input {
-    height: 0;
-    width: 0;
-    opacity: 0;
+    display: none;
+}
+
+.game-info-header span {
+    padding-left: 50px;
 }
 
 

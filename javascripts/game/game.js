@@ -21,6 +21,10 @@ class Game {
 
     this.waveInProgress = false;
     this.difficulty = 0;
+
+    this.interval;
+
+    this.score = 0;
   }
 
   update(timeStamp) {
@@ -34,6 +38,8 @@ class Game {
         this.player.movement.posY
       )
       this.world.handleCollision(enemy);
+
+      if (enemy.despawn) this.score++;
       return !enemy.despawn;
     });
     

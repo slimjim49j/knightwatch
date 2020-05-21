@@ -635,8 +635,8 @@ function setupAnimatorParams() {
     mode: "idle",
     loop: false,
     delay: null,
-    offsetX: -1,
-    offsetY: -1
+    offsetX: 0,
+    offsetY: 0
   };
 }
 
@@ -1007,6 +1007,8 @@ var Game = /*#__PURE__*/function () {
     this.bulletCollisionDetection = this.bulletCollisionDetection.bind(this);
     this.waveInProgress = false;
     this.difficulty = 0;
+    this.interval;
+    this.score = 0;
   }
 
   _createClass(Game, [{
@@ -1021,6 +1023,7 @@ var Game = /*#__PURE__*/function () {
 
         _this.world.handleCollision(enemy);
 
+        if (enemy.despawn) _this.score++;
         return !enemy.despawn;
       }); // manager updates after enemies
 
@@ -1557,58 +1560,27 @@ var render = function render() {
 
   game.enemies.forEach(function (enemy) {
     if (enemy.active) {
-      display.drawSquare({
-        x: enemy.movement.posX,
-        y: enemy.movement.posY,
-        width: enemy.width,
-        height: enemy.height,
-        color: "pink"
-      });
+      // display.drawSquare({ x: enemy.movement.posX, y: enemy.movement.posY, width: enemy.width, height: enemy.height, color: "pink" })
       display.drawObject(enemy.currentFrame, enemy.movement.posX + enemy.offsetX, enemy.movement.posY + enemy.offsetY);
     } else {
-      display.drawRotatedObject(enemy.currentFrame, enemy.movement.posX, enemy.movement.posY, 60);
-      display.drawSquare({
-        x: enemy.movement.posX,
-        y: enemy.movement.posY,
-        width: enemy.width,
-        height: enemy.height,
-        color: "#00000099"
-      });
+      display.drawRotatedObject(enemy.currentFrame, enemy.movement.posX, enemy.movement.posY, 60); // display.drawSquare({ x: enemy.movement.posX, y: enemy.movement.posY, width: enemy.width, height: enemy.height, color: "#00000099" });
     }
   }); // draw player
 
   var _game$player$movement = game.player.movement,
       playerX = _game$player$movement.posX,
-      playerY = _game$player$movement.posY;
-  display.drawSquare({
-    x: playerX,
-    y: playerY,
-    width: game.player.width,
-    height: game.player.height,
-    color: "pink"
-  });
+      playerY = _game$player$movement.posY; // display.drawSquare({x: playerX, y: playerY, width: game.player.width, height: game.player.height, color: "pink" });
+
   display.drawObject(game.player.currentFrame, playerX + game.player.offsetX, playerY + game.player.offsetY); // temp bullets
 
   game.player.gun.bullets.forEach(function (bullet) {
-    display.drawSquare({
-      x: bullet.movement.posX,
-      y: bullet.movement.posY,
-      width: bullet.width,
-      height: bullet.height,
-      color: "pink"
-    });
-    display.drawRotatedObject(bullet.currentFrame, bullet.movement.posX, bullet.movement.posY, bullet.angle);
+    // display.drawSquare({ x: bullet.movement.posX, y: bullet.movement.posY, width: bullet.width, height: bullet.height, color: "pink" })
+    display.drawRotatedObject(bullet.currentFrame, bullet.movement.posX + bullet.offsetX, bullet.movement.posY + bullet.offsetY, bullet.angle);
   });
   game.enemies.forEach(function (enemy) {
     enemy.gun.bullets.forEach(function (bullet) {
-      display.drawSquare({
-        x: bullet.movement.posX,
-        y: bullet.movement.posY,
-        width: bullet.width,
-        height: bullet.height,
-        color: "pink"
-      });
-      display.drawRotatedObject(bullet.currentFrame, bullet.movement.posX, bullet.movement.posY, bullet.angle);
+      // display.drawSquare({ x: bullet.movement.posX, y: bullet.movement.posY, width: bullet.width, height: bullet.height, color: "pink" })
+      display.drawRotatedObject(bullet.currentFrame, bullet.movement.posX + bullet.offsetX, bullet.movement.posY + bullet.offsetY, bullet.angle);
     });
   }); // ui
 
@@ -1616,9 +1588,22 @@ var render = function render() {
   display.render();
 };
 
+var renderEndScreen = function renderEndScreen() {
+  window.setTimeout(function () {
+    display.renderColor("#00000088");
+    display.render();
+  }, 500);
+};
+
+var difficultySpan = document.querySelector(".difficulty-span");
+var scoreSpan = document.querySelector(".score-span");
+
 var update = function update(timeStamp) {
   router();
   game.update(timeStamp);
+  difficultySpan.textContent = "Difficulty: ".concat(game.difficulty);
+  scoreSpan.textContent = "Score: ".concat(game.score);
+  if (game.player.health === 0) endGame();
 };
 
 var router = function router() {
@@ -1665,6 +1650,7 @@ var playToggleCheckbox = document.querySelector(".play-toggle-label input");
 var playToggleSpan = document.querySelector(".play-toggle-label span");
 playToggleCheckbox.addEventListener("change", function (e) {
   e.stopPropagation();
+  if (game.player.health === 0) return;
   play = !play;
 
   if (imgLoaded && play) {
@@ -1714,6 +1700,11 @@ function pauseActivity() {
   }); // pause enemy manager
 
   game.interval.pause();
+}
+
+function endGame() {
+  pauseActivity();
+  renderEndScreen();
 }
 
 display.tileSheet.loadImage();
