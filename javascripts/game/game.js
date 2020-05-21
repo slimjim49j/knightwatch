@@ -64,7 +64,7 @@ class Game {
         if (bullet.isColliding(this.player)) {
           this.player.damage(bullet.damage);
         }
-        console.log("player health:", this.player.health);
+        // console.log("player health:", this.player.health);
       }, this);
 
       // enemy bullet collision
@@ -73,7 +73,7 @@ class Game {
           if (bullet.isColliding(enemy)) {
             enemy.health -= bullet.damage;
           }
-          console.log("enemy health:", enemy.health);
+          // console.log("enemy health:", enemy.health);
         });
       }
     }, this);

@@ -54,6 +54,8 @@ const render = function() {
     });
   })
 
+  // top of map
+  display.drawMap(game.world.topMap);
 
   
   // ui

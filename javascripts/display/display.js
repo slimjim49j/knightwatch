@@ -106,6 +106,8 @@ class Display {
     const size = this.tileSheet.size;
     map.forEach((row, i) => {
       row.forEach((tile, j) => {
+        if (tile === 0) return;
+        
         // coordinates of tile in tilesheet
         const tileX = (tile % this.tileSheet.cols) * size;
         const tileY = Math.floor(tile / this.tileSheet.cols) * size;

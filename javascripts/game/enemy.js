@@ -50,7 +50,7 @@ class Enemy extends Entities {
     // updates bullets
     this.gun.update();
 
-    console.log(this.gun.bullets);
+    // console.log(this.gun.bullets);
   }
 
   updateOrientation() {
