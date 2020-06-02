@@ -67,6 +67,24 @@ const render = function() {
 const renderEndScreen = function() {
   window.setTimeout( () => {
     display.renderColor("#00000088");
+
+      display.drawText({
+        text: "Game Over",
+        font: "30px Adventurer",
+        offsetY: 0,
+      });
+      display.drawText({
+        text: `Score: ${game.score}`,
+        font: "15px Adventurer",
+        color: "#ffffaa",
+        offsetY: 30,
+      });
+      display.drawText({
+        text: "Click Anywhere to Restart",
+        font: "15px Adventurer",
+        color: "#ffffaa",
+        offsetY: 60,
+      });
     display.render();
   }, 500);
 };
@@ -203,6 +221,15 @@ function pauseActivity() {
 function endGame() {
   pauseActivity();
   renderEndScreen();
+  enableRestart();
 }
+
+// restart
+function enableRestart() {
+  document.querySelector("#main").addEventListener("click", e => {
+    location.reload();
+  })
+}
+
 
 display.tileSheet.loadImage();

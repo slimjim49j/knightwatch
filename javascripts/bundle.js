@@ -301,6 +301,19 @@ var Display = /*#__PURE__*/function () {
       });
     }
   }, {
+    key: "drawText",
+    value: function drawText(_ref2) {
+      var text = _ref2.text,
+          font = _ref2.font,
+          color = _ref2.color,
+          offsetY = _ref2.offsetY;
+      this.buffer.imageSmoothingEnabled = false;
+      this.buffer.font = font;
+      this.buffer.fillStyle = color || "yellow";
+      this.buffer.textAlign = "center";
+      this.buffer.fillText(text, this.buffer.canvas.width / 2, this.buffer.canvas.height / 2 + offsetY);
+    }
+  }, {
     key: "render",
     value: function render() {
       this.context.drawImage(this.buffer.canvas, 0, 0, this.buffer.canvas.width, this.buffer.canvas.height, 0, 0, this.context.canvas.width, this.context.canvas.height);
@@ -1592,6 +1605,23 @@ var render = function render() {
 var renderEndScreen = function renderEndScreen() {
   window.setTimeout(function () {
     display.renderColor("#00000088");
+    display.drawText({
+      text: "Game Over",
+      font: "30px Adventurer",
+      offsetY: 0
+    });
+    display.drawText({
+      text: "Score: ".concat(game.score),
+      font: "15px Adventurer",
+      color: "#ffffaa",
+      offsetY: 30
+    });
+    display.drawText({
+      text: "Click Anywhere to Restart",
+      font: "15px Adventurer",
+      color: "#ffffaa",
+      offsetY: 60
+    });
     display.render();
   }, 500);
 };
@@ -1706,6 +1736,14 @@ function pauseActivity() {
 function endGame() {
   pauseActivity();
   renderEndScreen();
+  enableRestart();
+} // restart
+
+
+function enableRestart() {
+  document.querySelector("#main").addEventListener("click", function (e) {
+    location.reload();
+  });
 }
 
 display.tileSheet.loadImage();

@@ -140,6 +140,18 @@ class Display {
     this.drawSquare({x: 25, y: worldHeight - 25, width: healthWidth, height: 10, color: "red"})
   }
 
+  drawText({text, font, color, offsetY}) {
+    this.buffer.imageSmoothingEnabled = false;
+    this.buffer.font = font;
+    this.buffer.fillStyle = color || "yellow";
+    this.buffer.textAlign = "center";
+    this.buffer.fillText(
+      text, 
+      this.buffer.canvas.width / 2, 
+      this.buffer.canvas.height / 2 + offsetY
+    );
+  }
+
   render() {
     this.context.drawImage(
       this.buffer.canvas,
