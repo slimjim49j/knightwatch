@@ -1602,6 +1602,21 @@ var render = function render() {
   display.render();
 };
 
+var renderStartScreen = function renderStartScreen() {
+  display.drawText({
+    text: "KnightWatch",
+    font: "30px Adventurer",
+    offsetY: 0
+  });
+  display.drawText({
+    text: "click anywhere to begin",
+    font: "15px Adventurer",
+    color: "#ffffaa",
+    offsetY: 30
+  });
+  display.render();
+};
+
 var renderEndScreen = function renderEndScreen() {
   window.setTimeout(function () {
     display.renderColor("#00000088");
@@ -1673,13 +1688,16 @@ window.addEventListener("click", handleClick); // handle start / stop game play
 var imgLoaded = false;
 display.tileSheet.image.addEventListener("load", function () {
   display.handleResize(document.documentElement.clientWidth - 32, document.documentElement.clientHeight - 32, game.world.height / game.world.width);
-  imgLoaded = true; // engine.start();
+  imgLoaded = true;
+  enableStart(); // engine.start();
   // window.setTimeout(() => engine.stop(), 1000)
 });
 var play = false;
 var playToggleCheckbox = document.querySelector(".play-toggle-label input");
 var playToggleSpan = document.querySelector(".play-toggle-label span");
-playToggleCheckbox.addEventListener("change", function (e) {
+playToggleCheckbox.addEventListener("change", togglePlay);
+
+function togglePlay(e) {
   e.stopPropagation();
   if (game.player.health === 0) return;
   play = !play;
@@ -1691,7 +1709,8 @@ playToggleCheckbox.addEventListener("change", function (e) {
     pauseActivity();
     playToggleSpan.textContent = "Play";
   }
-}); // guns, bullets, enemy manager
+} // guns, bullets, enemy manager
+
 
 function resumeActivity() {
   engine.start(); // resume bullet expiration
@@ -1736,13 +1755,22 @@ function pauseActivity() {
 function endGame() {
   pauseActivity();
   renderEndScreen();
-  enableRestart();
+  window.setTimeout(enableRestart, 1000);
 } // restart
 
 
 function enableRestart() {
   document.querySelector("#main").addEventListener("click", function (e) {
     location.reload();
+  });
+} // click to start
+
+
+function enableStart() {
+  renderStartScreen();
+  document.querySelector("#main").addEventListener("click", function start(e) {
+    togglePlay(e);
+    document.querySelector("#main").removeEventListener("click", start);
   });
 }
 
