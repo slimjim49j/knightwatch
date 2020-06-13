@@ -418,12 +418,12 @@ var Leaderboard = /*#__PURE__*/function () {
         var newScoreAdded = false;
 
         _this2.highscores.forEach(function (score) {
-          if (score < newScore && !newScoreAdded) {
+          if (score.score < newScore.score && !newScoreAdded) {
             newHighscores.push(newScore);
             newScoreAdded = true;
-          } else {
-            newHighscores.push(score);
           }
+
+          newHighscores.push(score);
         });
 
         if (!newScoreAdded) newHighscores.push(newScore);

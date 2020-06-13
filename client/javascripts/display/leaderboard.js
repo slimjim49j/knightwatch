@@ -22,13 +22,11 @@ class Leaderboard {
                 let newHighscores = [];
                 let newScoreAdded = false;
                 this.highscores.forEach(score => {
-                    if (score < newScore && !newScoreAdded) {
+                    if (score.score < newScore.score && !newScoreAdded) {
                         newHighscores.push(newScore);
                         newScoreAdded = true;
                     }
-                    else {
-                        newHighscores.push(score)
-                    }
+                    newHighscores.push(score);
                 });
                 if (!newScoreAdded) newHighscores.push(newScore);
                 if (newHighscores.length > this.leaderboardLength) newHighscores.pop();
