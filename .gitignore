@@ -1,7 +1,11 @@
-/node_modules
-# /javascripts/bundle.js
-/javascripts/bundle.js.map
+/client/node_modules
+/server/node_modules
+/server/config/keys_dev.js
 
-/tileset/frames
-/tileset/crop.py
-/tileset/tiles_list_v1.3
+# /javascripts/bundle.js
+/client/javascripts/bundle.js.map
+
+/client/tileset/frames
+/client/tileset/crop.py
+/client/tileset/tiles_list_v1.3
+/client/tileset/0x72_DungeonTilesetII_v1.3.zip

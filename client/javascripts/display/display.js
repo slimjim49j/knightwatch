@@ -17,6 +17,32 @@ class Display {
     this.render = this.render.bind(this);
   }
 
+  updateLeaderboard(scores) {
+    const leaderboardList = document.querySelector(".leaderboard");
+    leaderboardList.textContent = "";
+    for (let i=0; i<scores.length; i++) {
+      const scoreLi = document.createElement("li");
+      
+      // refactor?
+      const nameSpan = document.createElement("span");
+      const difficultySpan = document.createElement("span");
+      const scoreSpan = document.createElement("span");
+
+      nameSpan.textContent = `Name: ${scores[i].name}`;
+      difficultySpan.textContent = `Difficulty: ${scores[i].difficulty}`;
+      scoreSpan.textContent = `Score: ${scores[i].score}`;
+
+      scoreLi.append(nameSpan, difficultySpan, scoreSpan);
+      leaderboardList.append(scoreLi);
+    }
+  }
+
+  toggleHighscoreModal() {
+    const modalWrapperClassList = document.querySelector(".highscore-modal-wrapper").classList;
+    if (Array.from(modalWrapperClassList).includes("hidden")) modalWrapperClassList.remove("hidden");
+    else modalWrapperClassList.add("hidden");
+  }
+
   renderColor(color) {
     this.buffer.fillStyle = color;
     this.buffer.fillRect(
@@ -174,6 +200,7 @@ class Display {
       this.context.canvas.height = height;
       this.context.canvas.width = height / worldRatio;
     }
+    this.context.canvas.style.margin = "0 auto";
 
     this.context.imageSmoothingEnabled = false;
   }

@@ -2,6 +2,7 @@ import Controller from "./controller";
 import Display from "./display/display";
 import Engine from "./engine";
 import Game from "./game/game";
+import Leaderboard from "./display/leaderboard";
 
 const render = function() {
   display.renderColor("#000000");
@@ -129,9 +130,25 @@ const controller = new Controller();
 const display = new Display(document.querySelector("canvas"));
 const engine = new Engine(1000 / 30, update, render);
 const game = new Game();
+const leaderboard = new Leaderboard();
 
 display.buffer.canvas.height = game.world.height;
 display.buffer.canvas.width = game.world.width;
+
+// leaderboard logic
+leaderboard.getScores()
+  .then(() => display.updateLeaderboard(leaderboard.highscores));
+
+document.querySelector(".highscore-modal .exit-btn").addEventListener("click", display.toggleHighscoreModal);
+document.querySelector(".highscore-modal .submit-btn").addEventListener("click", e => {
+  const name = document.querySelector(".name-field").value;
+  leaderboard.postScore({
+    name,
+    difficulty: game.difficulty,
+    score: game.score
+  }).then(() => display.updateLeaderboard(leaderboard.highscores));
+  display.toggleHighscoreModal();
+});
 
 
 
@@ -199,6 +216,7 @@ function togglePlay(e) {
 
 // guns, bullets, enemy manager
 function resumeActivity() {
+  document.querySelector(".game-wrapper").scrollIntoView();
   engine.start();
 
   // resume bullet expiration
@@ -237,6 +255,7 @@ function pauseActivity() {
 }
 
 function endGame() {
+  if (leaderboard.isHighscore(game.score)) display.toggleHighscoreModal();
   pauseActivity();
   renderEndScreen();
   window.setTimeout(enableRestart, 1000);

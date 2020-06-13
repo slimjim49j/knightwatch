@@ -9,7 +9,11 @@
 </head>
 <body>
     <h1 class="glow-text">KnightWatch</h1>
-    <main class="canvas-wrapper">
+
+    <ul class="leaderboard">
+    </ul>
+    
+    <main class="game-wrapper">
         <div class="game-info-header">
             <label class="play-toggle-label">
                 <input type="checkbox" name="" id="">
@@ -26,6 +30,18 @@
         <p>Fight infinite waves of enemies in increasingly difficult battles!</p>
         <p>Use the "WASD" keys to navigate.</p>
         <p>Click to throw a knife.</p>
+    </div>
+
+    <div class="highscore-modal-wrapper hidden">
+        <div class="highscore-modal">
+            <h3>You got a high score!</h3>
+            <p>Enter a name to go on the leaderboard</p>
+            <input type="text" class="name-field">
+            <div>
+                <button class="exit-btn">Exit</button>
+                <button class="submit-btn">Submit</button>
+            </div>
+        </div>
     </div>
 </body>
 </html>
