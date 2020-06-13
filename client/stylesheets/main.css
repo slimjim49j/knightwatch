@@ -124,12 +124,12 @@ h1 {
 
 
 /*   INSTRUCTIONS  */
-.instructions h2 {
+h2 {
     font-size: 45px;
     text-align: center;
 }
 
-.instructions p {
+p {
     font-size: 25px;
     text-align: center;
 }
@@ -139,7 +139,70 @@ h1 {
 
 
 
-/* highscroe mdoal */
+/* highscore modal */
+.highscore-modal-wrapper {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: rgba(0, 0, 0, 0.349);
+}
+
+.highscore-modal {
+    /* position: absolute; */
+    /* left: 50%; */
+    /* top: 50%; */
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    align-items: center;
+    background-color: rgb(36, 36, 36);
+    text-align: center;
+    
+    width: 30%;
+    height: 20%;
+    max-width: 600px;
+    max-height: 400px;
+    padding: 30px;
+    border: 1px solid gray;
+    border-radius: 8px;
+    /* margin: auto; */
+}
+
+.highscore-modal input[type=text] {
+    display: inline-block;
+    background-color: rgba(36, 36, 36, 0.507);
+    font-size: 25px;
+    
+    width: 50%;
+    border: 1px solid gray;
+    /* margin: auto; */
+}
+
+.btns-wrapper {
+    padding-top: 10px;
+}
+
+.exit-btn, .submit-btn {
+    background-color: transparent;
+    font-size: 20px;
+    border: none;
+    cursor: pointer;
+}
+
+.exit-btn {
+    color: rgba(255, 255, 255, 0.774);
+}
+
+.submit-btn {
+    color: white;
+}
+
 .hidden {
     display: none;
 }
