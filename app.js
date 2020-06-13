@@ -13,9 +13,9 @@ const bodyParser = require("body-parser");
 const path = require("path");
 
 // if (process.env.NODE_ENV === "production") {
-    app.use(express.static("../client"));
+    app.use(express.static("client"));
     app.get("/", (req, res) => {
-        res.sendFile(path.resolve(__dirname, "..", "client", "index.html"));
+        res.sendFile(path.resolve(__dirname, "client", "index.html"));
     });
 // }
 

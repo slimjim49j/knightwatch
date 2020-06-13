@@ -1,6 +1,6 @@
 /client/node_modules
-/server/node_modules
-/server/config/keys_dev.js
+/node_modules
+/config/keys_dev.js
 
 # /javascripts/bundle.js
 /client/javascripts/bundle.js.map
