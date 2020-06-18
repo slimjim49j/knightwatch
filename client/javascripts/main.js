@@ -1,8 +1,8 @@
 import Controller from "./controller";
-import Display from "./display/display";
+import Display from "./controllers/display";
 import Engine from "./engine";
 import Game from "./game/game";
-import Leaderboard from "./display/leaderboard";
+import Leaderboard from "./controllers/leaderboard";
 
 const render = function() {
   display.renderColor("#000000");
