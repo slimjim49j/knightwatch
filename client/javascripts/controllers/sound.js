@@ -4,9 +4,10 @@ class Sound {
     constructor() {
     }
 
-    // initialize() {
-    //     await Tone.start();
-    // }
+    async start() {
+        await Tone.start();
+        console.log("ready");
+    }
 }
 
 export default Sound;
