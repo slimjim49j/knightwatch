@@ -3,6 +3,7 @@ import Display from "./controllers/display";
 import Engine from "./engine";
 import Game from "./game/game";
 import Leaderboard from "./controllers/leaderboard";
+import Sound from "./controllers/sound";
 
 const render = function() {
   display.renderColor("#000000");
@@ -131,6 +132,7 @@ const display = new Display(document.querySelector("canvas"));
 const engine = new Engine(1000 / 30, update, render);
 const game = new Game();
 const leaderboard = new Leaderboard();
+let sound;
 
 display.buffer.canvas.height = game.world.height;
 display.buffer.canvas.width = game.world.width;
@@ -233,6 +235,9 @@ function resumeActivity() {
   
   // resume enemy manager
   if (game.interval) game.interval.resume();
+
+  // sound
+
 }
 
 function pauseActivity() {
@@ -274,6 +279,9 @@ function enableStart() {
   renderStartScreen();
   document.querySelector("#main").addEventListener("click", function start(e) {
     togglePlay(e);
+    sound = new Sound();
+    sound.test();
+
     document.querySelector("#main").removeEventListener("click", start);
   })
 }
