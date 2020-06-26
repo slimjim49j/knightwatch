@@ -237,7 +237,7 @@ function resumeActivity() {
   if (game.interval) game.interval.resume();
 
   // sound
-
+  sound.start();
 }
 
 function pauseActivity() {
@@ -257,6 +257,9 @@ function pauseActivity() {
 
   // pause enemy manager
   game.interval.pause();
+
+  // sound
+  sound.stop();
 }
 
 function endGame() {
@@ -278,9 +281,9 @@ function enableRestart() {
 function enableStart() {
   renderStartScreen();
   document.querySelector("#main").addEventListener("click", function start(e) {
-    togglePlay(e);
     sound = new Sound();
-    sound.test();
+    
+    togglePlay(e);
 
     document.querySelector("#main").removeEventListener("click", start);
   })

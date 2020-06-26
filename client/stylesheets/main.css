@@ -177,7 +177,7 @@ p {
     text-align: center;
     
     width: 30%;
-    height: 20%;
+    height: fit-content;
     max-width: 600px;
     max-height: 400px;
     padding: 30px;

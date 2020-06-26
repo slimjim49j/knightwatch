@@ -464,41 +464,51 @@ var tetrisTheme = __webpack_require__(/*! ./tetris_theme.json */ "./javascripts/
 var Sound = /*#__PURE__*/function () {
   function Sound() {
     _classCallCheck(this, Sound);
-  } // var synth = new Tone.Synth();
-  // synth.toMaster();
-  // synth.triggerAttackRelease("C4", "8n");
-  // async start() {
+  } // async start() {
   //     await Tone.start();
   //     console.log("ready");
   // }
 
 
   _createClass(Sound, [{
-    key: "test",
-    value: function test() {
+    key: "createSynth",
+    value: function createSynth() {
       //create a synth and connect it to the master output (your speakers)
-      var synth = new tone__WEBPACK_IMPORTED_MODULE_0__["PolySynth"](4, tone__WEBPACK_IMPORTED_MODULE_0__["Synth"], {
+      this.synth = new tone__WEBPACK_IMPORTED_MODULE_0__["PolySynth"](4, tone__WEBPACK_IMPORTED_MODULE_0__["Synth"], {
         oscillator: {
           type: "sawtooth"
         }
       }).toMaster();
-      synth.set("detune", -1000); // synth.triggerAttackRelease('A4', 3, 0)
-      // synth.triggerAttackRelease('D4', 3, 1)
-      // synth.triggerAttackRelease('A4', 3, 2)
-      // synth.triggerAttackRelease('C1', 3, 3)
-      //pass in an array of events
+      this.synth.set("detune", -1000);
+    }
+  }, {
+    key: "createPart",
+    value: function createPart() {
+      var _this = this;
 
-      var part = new tone__WEBPACK_IMPORTED_MODULE_0__["Part"](function (time, event) {
+      //pass in an array of events
+      this.part = new tone__WEBPACK_IMPORTED_MODULE_0__["Part"](function (time, event) {
         //the events will be given to the callback with the time they occur
-        synth.triggerAttackRelease(event.name, event.duration, time);
+        _this.synth.triggerAttackRelease(event.name, event.duration, time);
       }, tetrisTheme); //start the part at the beginning of the Transport's timeline
 
-      part.start(0); //loop the part 3 times
-      // part.loop = 1
-      // part.loopEnd = '10m'
+      this.part.start(0); //loop the part after 135s infinitely
+      // (song lasts approx 1:35, extra time is for padding)
 
-      tone__WEBPACK_IMPORTED_MODULE_0__["Transport"].toggle(); //start/stop the transport
-      // document.querySelector('tone-play-toggle').addEventListener('change', e => Tone.Transport.toggle())
+      this.part.loop = true;
+      this.part.loopEnd = 135;
+    }
+  }, {
+    key: "start",
+    value: function start() {
+      if (!this.synth) this.createSynth();
+      if (!this.part) this.createPart();
+      tone__WEBPACK_IMPORTED_MODULE_0__["Transport"].start();
+    }
+  }, {
+    key: "stop",
+    value: function stop() {
+      tone__WEBPACK_IMPORTED_MODULE_0__["Transport"].pause();
     }
   }]);
 
@@ -1933,6 +1943,8 @@ function resumeActivity() {
   }); // resume enemy manager
 
   if (game.interval) game.interval.resume(); // sound
+
+  sound.start();
 }
 
 function pauseActivity() {
@@ -1952,7 +1964,9 @@ function pauseActivity() {
     if (enemy.gun.allowFire) enemy.gun.allowFire.pause();
   }); // pause enemy manager
 
-  game.interval.pause();
+  game.interval.pause(); // sound
+
+  sound.stop();
 }
 
 function endGame() {
@@ -1973,9 +1987,8 @@ function enableRestart() {
 function enableStart() {
   renderStartScreen();
   document.querySelector("#main").addEventListener("click", function start(e) {
-    togglePlay(e);
     sound = new _controllers_sound__WEBPACK_IMPORTED_MODULE_5__["default"]();
-    sound.test();
+    togglePlay(e);
     document.querySelector("#main").removeEventListener("click", start);
   });
 }
