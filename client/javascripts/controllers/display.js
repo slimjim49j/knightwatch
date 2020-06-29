@@ -162,6 +162,13 @@ class Display {
     });
   }
 
+  drawRadialGradient({innerX, innerY, innerR, outerX, outerY, outerR}) {
+    const grd = this.buffer.createRadialGradient(innerX, innerY, innerR, outerX, outerY, outerR);
+    grd.addColorStop(0, "transparent");
+    grd.addColorStop(1, "black");
+    this.renderColor(grd);
+  }
+
   drawHealth(worldWidth, worldHeight, health, maxHealth) {
     const barWidth = worldWidth * 0.2;
     if (barWidth < 30) barWidth = 30;

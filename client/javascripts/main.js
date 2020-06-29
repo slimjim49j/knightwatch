@@ -59,9 +59,18 @@ const render = function() {
   // top of map
   display.drawMap(game.world.topMap);
 
+  // shadow
+  display.drawRadialGradient({
+    innerX: playerX,
+    innerY: playerY,
+    innerR: 15,
+    outerX: playerX,
+    outerY: playerY,
+    outerR: 500
+  });
   
   // ui
-  display.drawHealth(game.world.width, game.world.height, game.player.health, game.player.maxHealth)
+  display.drawHealth(game.world.width, game.world.height, game.player.health, game.player.maxHealth);
   
   display.render();
 };

@@ -314,6 +314,20 @@ var Display = /*#__PURE__*/function () {
       });
     }
   }, {
+    key: "drawRadialGradient",
+    value: function drawRadialGradient(_ref2) {
+      var innerX = _ref2.innerX,
+          innerY = _ref2.innerY,
+          innerR = _ref2.innerR,
+          outerX = _ref2.outerX,
+          outerY = _ref2.outerY,
+          outerR = _ref2.outerR;
+      var grd = this.buffer.createRadialGradient(innerX, innerY, innerR, outerX, outerY, outerR);
+      grd.addColorStop(0, "transparent");
+      grd.addColorStop(1, "black");
+      this.renderColor(grd);
+    }
+  }, {
     key: "drawHealth",
     value: function drawHealth(worldWidth, worldHeight, health, maxHealth) {
       var barWidth = worldWidth * 0.2;
@@ -337,11 +351,11 @@ var Display = /*#__PURE__*/function () {
     }
   }, {
     key: "drawText",
-    value: function drawText(_ref2) {
-      var text = _ref2.text,
-          font = _ref2.font,
-          color = _ref2.color,
-          offsetY = _ref2.offsetY;
+    value: function drawText(_ref3) {
+      var text = _ref3.text,
+          font = _ref3.font,
+          color = _ref3.color,
+          offsetY = _ref3.offsetY;
       this.buffer.imageSmoothingEnabled = false;
       this.buffer.font = font;
       this.buffer.fillStyle = color || "yellow";
@@ -1806,7 +1820,16 @@ var render = function render() {
     });
   }); // top of map
 
-  display.drawMap(game.world.topMap); // ui
+  display.drawMap(game.world.topMap); // shadow
+
+  display.drawRadialGradient({
+    innerX: playerX,
+    innerY: playerY,
+    innerR: 15,
+    outerX: playerX,
+    outerY: playerY,
+    outerR: 500
+  }); // ui
 
   display.drawHealth(game.world.width, game.world.height, game.player.health, game.player.maxHealth);
   display.render();
