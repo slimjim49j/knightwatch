@@ -14,15 +14,19 @@ class Controller {
   handleKeyChange(eventType, keyCode) {
     const keyDown = eventType === "keydown";
     switch (keyCode) {
+      case 38:
       case 87:
         this.keys.up.setActive(keyDown);
         break;
+      case 39:
       case 68:
         this.keys.right.setActive(keyDown);
         break;
+      case 40:
       case 83:
         this.keys.down.setActive(keyDown);
         break;
+      case 37:
       case 65:
         this.keys.left.setActive(keyDown);
         break;

@@ -156,6 +156,7 @@ document.querySelector(".highscore-modal .submit-btn").addEventListener("click",
 
 // Event Handling
 const handleKeyChange = function(e) {
+  e.preventDefault();
   controller.handleKeyChange(e.type, e.keyCode);
 };
 

@@ -121,18 +121,22 @@ var Controller = /*#__PURE__*/function () {
       var keyDown = eventType === "keydown";
 
       switch (keyCode) {
+        case 38:
         case 87:
           this.keys.up.setActive(keyDown);
           break;
 
+        case 39:
         case 68:
           this.keys.right.setActive(keyDown);
           break;
 
+        case 40:
         case 83:
           this.keys.down.setActive(keyDown);
           break;
 
+        case 37:
         case 65:
           this.keys.left.setActive(keyDown);
           break;
@@ -478,8 +482,9 @@ var Sound = /*#__PURE__*/function () {
         oscillator: {
           type: "sawtooth"
         }
-      }).toMaster();
-      this.synth.set("detune", -1000);
+      }).toMaster(); // this.synth.set("detune", -1000);
+
+      this.synth.set("volume", -7);
     }
   }, {
     key: "createPart",
@@ -1879,6 +1884,7 @@ document.querySelector(".highscore-modal .submit-btn").addEventListener("click",
 }); // Event Handling
 
 var handleKeyChange = function handleKeyChange(e) {
+  e.preventDefault();
   controller.handleKeyChange(e.type, e.keyCode);
 };
 

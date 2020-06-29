@@ -12,7 +12,8 @@ class Sound {
     createSynth() {
         //create a synth and connect it to the master output (your speakers)
         this.synth = new Tone.PolySynth(4, Tone.Synth, { oscillator: { type: "sawtooth" } }).toMaster();
-        this.synth.set("detune", -1000);
+        // this.synth.set("detune", -1000);
+        this.synth.set("volume", -7);
     }
 
     createPart() {
