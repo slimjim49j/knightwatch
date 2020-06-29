@@ -396,7 +396,7 @@ var Leaderboard = /*#__PURE__*/function () {
   _createClass(Leaderboard, [{
     key: "isHighscore",
     value: function isHighscore(score) {
-      return this.highscores.length < this.leaderboardLength || score > this.highscores[this.highscores.length - 1];
+      return this.highscores.length < this.leaderboardLength || score > this.highscores[this.highscores.length - 1].score;
     }
   }, {
     key: "getScores",

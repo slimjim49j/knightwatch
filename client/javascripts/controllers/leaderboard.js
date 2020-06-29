@@ -7,7 +7,7 @@ class Leaderboard {
     }
 
     isHighscore(score) {
-        return this.highscores.length < this.leaderboardLength || score > this.highscores[this.highscores.length-1];
+        return this.highscores.length < this.leaderboardLength || score > this.highscores[this.highscores.length-1].score;
     }
 
     getScores() {
