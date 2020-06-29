@@ -155,12 +155,12 @@ document.querySelector(".highscore-modal .submit-btn").addEventListener("click",
 
 
 // Event Handling
-const handleKeyChange = function(e) {
+function handleKeyChange(e) {
   e.preventDefault();
   controller.handleKeyChange(e.type, e.keyCode);
 };
 
-const handleResize = function() {
+function handleResize() {
   display.handleResize(
     document.documentElement.clientWidth - 32,
     document.documentElement.clientHeight - 32,
@@ -169,15 +169,27 @@ const handleResize = function() {
   display.render();
 };
 
-const handleClick = function(e) {
+function handleClick(e) {
   const worldRatio = game.world.width / display.context.canvas.width;
   game.player.requestFire(e.offsetX * worldRatio, e.offsetY * worldRatio);
 };
+
+
+function handleAudioToggleClick() {
+  if (!play) return;
+
+  const audioPlaying = sound.isPlaying();
+  if (audioPlaying) sound.pause();
+  else sound.start();
+
+  display.updateAudioToggle(!audioPlaying);
+}
 
 window.addEventListener("resize", handleResize);
 window.addEventListener("keydown", handleKeyChange);
 window.addEventListener("keyup", handleKeyChange);
 window.addEventListener("click", handleClick);
+document.querySelector(".audio-toggle").addEventListener("click", handleAudioToggleClick);
 
 
 
@@ -215,6 +227,8 @@ function togglePlay(e) {
     pauseActivity();
     playToggleSpan.textContent = "Play"
   }
+
+  display.updateAudioToggle(sound.isPlaying());
 }
 
 // guns, bullets, enemy manager
@@ -260,7 +274,7 @@ function pauseActivity() {
   game.interval.pause();
 
   // sound
-  sound.stop();
+  sound.pause();
 }
 
 function endGame() {

@@ -235,6 +235,12 @@ var Display = /*#__PURE__*/function () {
       if (Array.from(modalWrapperClassList).includes("hidden")) modalWrapperClassList.remove("hidden");else modalWrapperClassList.add("hidden");
     }
   }, {
+    key: "updateAudioToggle",
+    value: function updateAudioToggle(audioPlaying) {
+      var audioToggle = document.querySelector(".audio-toggle");
+      if (audioPlaying) audioToggle.textContent = "Audio: On";else audioToggle.textContent = "Audio: Off";
+    }
+  }, {
     key: "renderColor",
     value: function renderColor(color) {
       this.buffer.fillStyle = color;
@@ -482,8 +488,8 @@ var Sound = /*#__PURE__*/function () {
         oscillator: {
           type: "sawtooth"
         }
-      }).toMaster(); // this.synth.set("detune", -1000);
-
+      }).toMaster();
+      this.synth.set("detune", -1000);
       this.synth.set("volume", -7);
     }
   }, {
@@ -511,9 +517,14 @@ var Sound = /*#__PURE__*/function () {
       tone__WEBPACK_IMPORTED_MODULE_0__["Transport"].start();
     }
   }, {
-    key: "stop",
-    value: function stop() {
+    key: "pause",
+    value: function pause() {
       tone__WEBPACK_IMPORTED_MODULE_0__["Transport"].pause();
+    }
+  }, {
+    key: "isPlaying",
+    value: function isPlaying() {
+      return tone__WEBPACK_IMPORTED_MODULE_0__["Transport"].state === "started";
     }
   }]);
 
@@ -1883,25 +1894,39 @@ document.querySelector(".highscore-modal .submit-btn").addEventListener("click",
   display.toggleHighscoreModal();
 }); // Event Handling
 
-var handleKeyChange = function handleKeyChange(e) {
+function handleKeyChange(e) {
   e.preventDefault();
   controller.handleKeyChange(e.type, e.keyCode);
-};
+}
 
-var handleResize = function handleResize() {
+;
+
+function handleResize() {
   display.handleResize(document.documentElement.clientWidth - 32, document.documentElement.clientHeight - 32, game.world.height / game.world.width);
   display.render();
-};
+}
 
-var handleClick = function handleClick(e) {
+;
+
+function handleClick(e) {
   var worldRatio = game.world.width / display.context.canvas.width;
   game.player.requestFire(e.offsetX * worldRatio, e.offsetY * worldRatio);
-};
+}
+
+;
+
+function handleAudioToggleClick() {
+  if (!play) return;
+  var audioPlaying = sound.isPlaying();
+  if (audioPlaying) sound.pause();else sound.start();
+  display.updateAudioToggle(!audioPlaying);
+}
 
 window.addEventListener("resize", handleResize);
 window.addEventListener("keydown", handleKeyChange);
 window.addEventListener("keyup", handleKeyChange);
-window.addEventListener("click", handleClick); // handle start / stop game play
+window.addEventListener("click", handleClick);
+document.querySelector(".audio-toggle").addEventListener("click", handleAudioToggleClick); // handle start / stop game play
 
 var imgLoaded = false;
 display.tileSheet.image.addEventListener("load", function () {
@@ -1927,6 +1952,8 @@ function togglePlay(e) {
     pauseActivity();
     playToggleSpan.textContent = "Play";
   }
+
+  display.updateAudioToggle(sound.isPlaying());
 } // guns, bullets, enemy manager
 
 
@@ -1972,7 +1999,7 @@ function pauseActivity() {
 
   game.interval.pause(); // sound
 
-  sound.stop();
+  sound.pause();
 }
 
 function endGame() {

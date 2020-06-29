@@ -43,6 +43,12 @@ class Display {
     else modalWrapperClassList.add("hidden");
   }
 
+  updateAudioToggle(audioPlaying) {
+    const audioToggle = document.querySelector(".audio-toggle");
+    if (audioPlaying) audioToggle.textContent = "Audio: On";
+    else audioToggle.textContent = "Audio: Off";
+  }
+
   renderColor(color) {
     this.buffer.fillStyle = color;
     this.buffer.fillRect(
