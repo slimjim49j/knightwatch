@@ -45,7 +45,6 @@ const render = function() {
     
   // draw player
   const { posX: playerX, posY: playerY } = game.player.movement;
-  // display.drawSquare({x: playerX, y: playerY, width: game.player.width, height: game.player.height, color: "pink" });
   display.drawObject(game.player.currentFrame, playerX + game.player.offsetX, playerY + game.player.offsetY);
 
   // bullets
