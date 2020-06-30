@@ -165,7 +165,7 @@ document.querySelector(".highscore-modal .submit-btn").addEventListener("click",
 
 // Event Handling
 function handleKeyChange(e) {
-  e.preventDefault();
+  if (e.keyCode >= 37 || e.keyCode <= 40) e.preventDefault();
   controller.handleKeyChange(e.type, e.keyCode);
 };
 
@@ -183,7 +183,7 @@ function handleClick(e) {
   game.player.requestFire(e.offsetX * worldRatio, e.offsetY * worldRatio);
 };
 
-
+let audioPlaying = true;
 function handleAudioToggleClick() {
   if (!play) return;
 
