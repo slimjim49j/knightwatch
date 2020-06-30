@@ -87,4 +87,4 @@ const render = function() {
   display.render();
 };
 ```
-This is the main render function that tells the display class what to draw to the canvas. This function is then passed to the engine class where it is displayed on the screen.
+This is the main render function that tells the display class what to draw to the canvas. This function is given to the engine class which calls it on every successful game update.
