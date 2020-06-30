@@ -1919,7 +1919,7 @@ document.querySelector(".highscore-modal .submit-btn").addEventListener("click",
 }); // Event Handling
 
 function handleKeyChange(e) {
-  if (e.keyCode >= 37 || e.keyCode <= 40) e.preventDefault();
+  if (e.keyCode >= 37 && e.keyCode <= 40) e.preventDefault();
   controller.handleKeyChange(e.type, e.keyCode);
 }
 
