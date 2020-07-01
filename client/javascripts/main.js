@@ -141,7 +141,7 @@ const display = new Display(document.querySelector("canvas"));
 const engine = new Engine(1000 / 30, update, render);
 const game = new Game();
 const leaderboard = new Leaderboard();
-let sound;
+const sound = new Sound();
 
 display.buffer.canvas.height = game.world.height;
 display.buffer.canvas.width = game.world.width;
@@ -305,8 +305,6 @@ function enableRestart() {
 function enableStart() {
   renderStartScreen();
   document.querySelector("#main").addEventListener("click", function start(e) {
-    sound = new Sound();
-    
     togglePlay(e);
 
     document.querySelector("#main").removeEventListener("click", start);
