@@ -62,7 +62,7 @@ class Game {
         this.world.handleCollision(bullet);
         
         if (bullet.isColliding(this.player)) {
-          this.player.damage(bullet.damage);
+          this.player.damage(bullet.damage, bullet.knockbackVel, bullet.angle);
         }
         // console.log("player health:", this.player.health);
       }, this);
@@ -71,7 +71,7 @@ class Game {
       if (enemy.active) {
         this.player.gun.bullets.forEach(bullet => {
           if (bullet.isColliding(enemy)) {
-            enemy.health -= bullet.damage;
+            enemy.damage(bullet.damage, bullet.knockbackVel, bullet.angle);
           }
           // console.log("enemy health:", enemy.health);
         });
@@ -95,8 +95,8 @@ class Game {
             new Enemy(
               10, 10,
               {
-                posX: Math.random() * this.world.width,
-                posY: Math.random() * this.world.height,
+                posX: Math.random() * (this.world.width - 64) + 32,
+                posY: Math.random() * (this.world.height - 64) + 32,
                 velX: 0,
                 velY: 0 
               }

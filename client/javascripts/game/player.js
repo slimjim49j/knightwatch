@@ -7,7 +7,7 @@ class Player extends Entities {
     const animatorParams = setupAnimatorParams();
     super(width, height, movement, animatorParams);
     
-    this.gun = new Gun(5000, () => 300);
+    this.gun = new Gun(5000, () => 300, 5);
     this.health = 10;
     this.maxHealth = 10;
   }
@@ -37,9 +37,13 @@ class Player extends Entities {
   }
 
   // damage should always be greater than 0
-  damage(damageAmt) {
+  // copied to enemy, common parent needed
+  damage(damageAmt, knockbackVel, angle) {
     this.health -= damageAmt;
     if (this.health < 0) this.health = 0;
+
+    this.movement.velX += knockbackVel * Math.cos(angle);
+    this.movement.velY += knockbackVel * Math.sin(angle);
   }
 
   heal(healAmt) {

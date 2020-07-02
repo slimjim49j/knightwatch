@@ -3,10 +3,11 @@ import FrameManager from "./frame_manager";
 import { Timer } from "../util/timers";
 
 class Bullet extends Entities {
-  constructor(width, height, expireTime, movement, angle) {
+  constructor(width, height, expireTime, movement, angle, knockbackVel) {
     const animatorParams = setupAnimatorParams();
     super(width, height, movement, animatorParams);
     this.angle = angle;
+    this.knockbackVel = knockbackVel;
     // this.spawnTime = spawnTime;
     // this.expirationTime = 5000;
     this.expired = false;

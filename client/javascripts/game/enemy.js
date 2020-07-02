@@ -8,7 +8,7 @@ class Enemy extends Entities {
     super(width, height, movement, animatorParams);
 
     const calcFireInterval = () => Math.random() * 3000 + 500;
-    this.gun = new Gun(10000, calcFireInterval);
+    this.gun = new Gun(5000, calcFireInterval, 5);
 
     this.health = 5;
     this.despawn = false;
@@ -31,11 +31,8 @@ class Enemy extends Entities {
     if (this.active) {
       const { posX: enemyX, posY: enemyY } = this.movement;
       const angle = Math.atan2(targetY - enemyY, targetX - enemyX);
-      this.movement.velX = 2 * Math.cos(angle);
-      this.movement.velY = 2 * Math.sin(angle);
-
-      // update position
-      super.update(friction);
+      this.movement.velX += 0.33 * Math.cos(angle);
+      this.movement.velY += 0.33 * Math.sin(angle);
 
       // fire bullet at target
       this.requestFire(targetX, targetY);
@@ -43,14 +40,30 @@ class Enemy extends Entities {
       this.updateOrientation();
       this.updateAnimationMode();
     } else {
+      // set loop to false if not already
+      if (this.loop !== false) this.changeMode("idle", false);
+      
       // only actually despawn once all bullets have despawned
       if (this.gun.bullets.length === 0) this.handleDespawn();
     }
+
+    // update position
+    super.update(friction);
 
     // updates bullets
     this.gun.update();
 
     // console.log(this.gun.bullets);
+  }
+
+  // damage should always be greater than 0
+  // copied from player, common parent needed
+  damage(damageAmt, knockbackVel, angle) {
+    this.health -= damageAmt;
+    if (this.health < 0) this.health = 0;
+    
+    this.movement.velX += knockbackVel * Math.cos(angle);
+    this.movement.velY += knockbackVel * Math.sin(angle);
   }
 
   updateOrientation() {

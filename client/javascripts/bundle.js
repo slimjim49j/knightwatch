@@ -810,14 +810,15 @@ var Bullet = /*#__PURE__*/function (_Entities) {
 
   var _super = _createSuper(Bullet);
 
-  function Bullet(width, height, expireTime, movement, angle) {
+  function Bullet(width, height, expireTime, movement, angle, knockbackVel) {
     var _this;
 
     _classCallCheck(this, Bullet);
 
     var animatorParams = setupAnimatorParams();
     _this = _super.call(this, width, height, movement, animatorParams);
-    _this.angle = angle; // this.spawnTime = spawnTime;
+    _this.angle = angle;
+    _this.knockbackVel = knockbackVel; // this.spawnTime = spawnTime;
     // this.expirationTime = 5000;
 
     _this.expired = false;
@@ -937,7 +938,7 @@ var Enemy = /*#__PURE__*/function (_Entities) {
       return Math.random() * 3000 + 500;
     };
 
-    _this.gun = new _gun__WEBPACK_IMPORTED_MODULE_1__["default"](10000, calcFireInterval);
+    _this.gun = new _gun__WEBPACK_IMPORTED_MODULE_1__["default"](5000, calcFireInterval, 5);
     _this.health = 5;
     _this.despawn = false;
     _this.active = true;
@@ -968,22 +969,34 @@ var Enemy = /*#__PURE__*/function (_Entities) {
             enemyX = _this$movement2.posX,
             enemyY = _this$movement2.posY;
         var angle = Math.atan2(targetY - enemyY, targetX - enemyX);
-        this.movement.velX = 2 * Math.cos(angle);
-        this.movement.velY = 2 * Math.sin(angle); // update position
-
-        _get(_getPrototypeOf(Enemy.prototype), "update", this).call(this, friction); // fire bullet at target
-
+        this.movement.velX += 0.33 * Math.cos(angle);
+        this.movement.velY += 0.33 * Math.sin(angle); // fire bullet at target
 
         this.requestFire(targetX, targetY);
         this.updateOrientation();
         this.updateAnimationMode();
       } else {
-        // only actually despawn once all bullets have despawned
+        // set loop to false if not already
+        if (this.loop !== false) this.changeMode("idle", false); // only actually despawn once all bullets have despawned
+
         if (this.gun.bullets.length === 0) this.handleDespawn();
-      } // updates bullets
+      } // update position
+
+
+      _get(_getPrototypeOf(Enemy.prototype), "update", this).call(this, friction); // updates bullets
 
 
       this.gun.update(); // console.log(this.gun.bullets);
+    } // damage should always be greater than 0
+    // copied from player, common parent needed
+
+  }, {
+    key: "damage",
+    value: function damage(damageAmt, knockbackVel, angle) {
+      this.health -= damageAmt;
+      if (this.health < 0) this.health = 0;
+      this.movement.velX += knockbackVel * Math.cos(angle);
+      this.movement.velY += knockbackVel * Math.sin(angle);
     }
   }, {
     key: "updateOrientation",
@@ -1279,7 +1292,7 @@ var Game = /*#__PURE__*/function () {
           _this2.world.handleCollision(bullet);
 
           if (bullet.isColliding(_this2.player)) {
-            _this2.player.damage(bullet.damage);
+            _this2.player.damage(bullet.damage, bullet.knockbackVel, bullet.angle);
           } // console.log("player health:", this.player.health);
 
         }, _this2); // enemy bullet collision
@@ -1287,7 +1300,7 @@ var Game = /*#__PURE__*/function () {
         if (enemy.active) {
           _this2.player.gun.bullets.forEach(function (bullet) {
             if (bullet.isColliding(enemy)) {
-              enemy.health -= bullet.damage;
+              enemy.damage(bullet.damage, bullet.knockbackVel, bullet.angle);
             } // console.log("enemy health:", enemy.health);
 
           });
@@ -1309,8 +1322,8 @@ var Game = /*#__PURE__*/function () {
         this.interval = new _util_timers__WEBPACK_IMPORTED_MODULE_3__["IntervalTimer"](function () {
           if (enemyCount > 0) {
             _this3.enemies.push(new _enemy__WEBPACK_IMPORTED_MODULE_0__["default"](10, 10, {
-              posX: Math.random() * _this3.world.width,
-              posY: Math.random() * _this3.world.height,
+              posX: Math.random() * (_this3.world.width - 64) + 32,
+              posY: Math.random() * (_this3.world.height - 64) + 32,
               velX: 0,
               velY: 0
             }));
@@ -1352,12 +1365,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 var Gun = /*#__PURE__*/function () {
-  function Gun(bulletExpireTime, calcFireInterval) {
+  function Gun(bulletExpireTime, calcFireInterval, knockbackVel) {
     _classCallCheck(this, Gun);
 
-    this.calcFireInterval = calcFireInterval;
     this.bullets = [];
     this.bulletExpireTime = bulletExpireTime;
+    this.calcFireInterval = calcFireInterval;
+    this.knockbackVel = knockbackVel;
     this.firing = false;
   }
 
@@ -1368,7 +1382,7 @@ var Gun = /*#__PURE__*/function () {
 
       if (!this.firing) {
         // debugger
-        this.bullets.push(new _bullet__WEBPACK_IMPORTED_MODULE_0__["default"](3, 3, this.bulletExpireTime, movement, angle));
+        this.bullets.push(new _bullet__WEBPACK_IMPORTED_MODULE_0__["default"](3, 3, this.bulletExpireTime, movement, angle, this.knockbackVel));
         this.firing = true;
         this.allowFire = new _util_timers__WEBPACK_IMPORTED_MODULE_1__["Timer"](function () {
           return _this.firing = false;
@@ -1448,7 +1462,7 @@ var Player = /*#__PURE__*/function (_Entities) {
     _this = _super.call(this, width, height, movement, animatorParams);
     _this.gun = new _gun__WEBPACK_IMPORTED_MODULE_1__["default"](5000, function () {
       return 300;
-    });
+    }, 5);
     _this.health = 10;
     _this.maxHealth = 10;
     return _this;
@@ -1483,12 +1497,15 @@ var Player = /*#__PURE__*/function (_Entities) {
       var speed = Math.abs(this.movement.velX);
       if (speed > 1 && this.mode === "idle") this.changeMode("run", true);else if (speed < 1 && this.mode === "run") this.changeMode("idle", true);
     } // damage should always be greater than 0
+    // copied to enemy, common parent needed
 
   }, {
     key: "damage",
-    value: function damage(damageAmt) {
+    value: function damage(damageAmt, knockbackVel, angle) {
       this.health -= damageAmt;
       if (this.health < 0) this.health = 0;
+      this.movement.velX += knockbackVel * Math.cos(angle);
+      this.movement.velY += knockbackVel * Math.sin(angle);
     }
   }, {
     key: "heal",
@@ -1898,7 +1915,7 @@ var display = new _controllers_display__WEBPACK_IMPORTED_MODULE_1__["default"](d
 var engine = new _engine__WEBPACK_IMPORTED_MODULE_2__["default"](1000 / 30, update, render);
 var game = new _game_game__WEBPACK_IMPORTED_MODULE_3__["default"]();
 var leaderboard = new _controllers_leaderboard__WEBPACK_IMPORTED_MODULE_4__["default"]();
-var sound;
+var sound = new _controllers_sound__WEBPACK_IMPORTED_MODULE_5__["default"]();
 display.buffer.canvas.height = game.world.height;
 display.buffer.canvas.width = game.world.width; // leaderboard logic
 
@@ -2045,7 +2062,6 @@ function enableRestart() {
 function enableStart() {
   renderStartScreen();
   document.querySelector("#main").addEventListener("click", function start(e) {
-    sound = new _controllers_sound__WEBPACK_IMPORTED_MODULE_5__["default"]();
     togglePlay(e);
     document.querySelector("#main").removeEventListener("click", start);
   });
