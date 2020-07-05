@@ -115,13 +115,13 @@ const renderEndScreen = function() {
   }, 500);
 };
 
-const difficultySpan = document.querySelector(".difficulty-span");
+const waveSpan = document.querySelector(".wave-span");
 const scoreSpan = document.querySelector(".score-span");
 const update = function(timeStamp) {
   router();
   game.update(timeStamp);
 
-  difficultySpan.textContent = `Difficulty: ${game.difficulty}`;
+  waveSpan.textContent = `Wave: ${game.wave}`;
   scoreSpan.textContent = `Score: ${game.score}`;
   
   if (game.player.health === 0) endGame();
@@ -139,7 +139,7 @@ const router = function() {
 const controller = new Controller();
 const display = new Display(document.querySelector("canvas"));
 const engine = new Engine(1000 / 30, update, render);
-const game = new Game();
+const game = new Game(document.querySelector(".difficulty-select").value);
 const leaderboard = new Leaderboard();
 const sound = new Sound();
 
@@ -147,14 +147,18 @@ display.buffer.canvas.height = game.world.height;
 display.buffer.canvas.width = game.world.width;
 
 // leaderboard logic
-leaderboard.getScores()
-  .then(() => display.updateLeaderboard(leaderboard.highscores));
+function updateLeaderboard() {
+  leaderboard.getScores()
+    .then(() => display.updateLeaderboard(leaderboard.highscores));
+}
+updateLeaderboard();
 
 document.querySelector(".highscore-modal .exit-btn").addEventListener("click", display.toggleHighscoreModal);
 document.querySelector(".highscore-modal .submit-btn").addEventListener("click", e => {
   const name = document.querySelector(".name-field").value;
   leaderboard.postScore({
     name,
+    wave: game.wave,
     difficulty: game.difficulty,
     score: game.score
   }).then(() => display.updateLeaderboard(leaderboard.highscores));
@@ -183,6 +187,7 @@ function handleClick(e) {
   game.player.requestFire(e.offsetX * worldRatio, e.offsetY * worldRatio);
 };
 
+// audio toggle
 let audioPlaying = true;
 function handleAudioToggleClick() {
   if (!play) return;
@@ -193,6 +198,17 @@ function handleAudioToggleClick() {
 
   display.updateAudioToggle(!audioPlaying);
 }
+
+document.querySelector(".leaderboard-radio-wrapper").addEventListener("change", () => {
+  updateLeaderboard();
+})
+
+// difficulty dropdown
+const difficultySelect = document.querySelector(".difficulty-select");
+difficultySelect.addEventListener("change", () => {
+  if (play) return;
+  else game.difficulty = difficultySelect.value;
+});
 
 window.addEventListener("resize", handleResize);
 window.addEventListener("keydown", handleKeyChange);
@@ -287,7 +303,7 @@ function pauseActivity() {
 }
 
 function endGame() {
-  if (leaderboard.isHighscore(game.score)) display.toggleHighscoreModal();
+  if (leaderboard.isHighscore(game.difficulty, game.score)) display.toggleHighscoreModal();
   pauseActivity();
   renderEndScreen();
   window.setTimeout(enableRestart, 1000);
@@ -295,7 +311,7 @@ function endGame() {
 
 // restart
 function enableRestart() {
-  document.querySelector("#main").addEventListener("click", e => {
+  document.querySelector("#main").addEventListener("click", () => {
     location.reload();
   })
 }
@@ -306,6 +322,8 @@ function enableStart() {
   renderStartScreen();
   document.querySelector("#main").addEventListener("click", function start(e) {
     togglePlay(e);
+
+    display.setDifficultySelectStatus(false);
 
     document.querySelector("#main").removeEventListener("click", start);
   })

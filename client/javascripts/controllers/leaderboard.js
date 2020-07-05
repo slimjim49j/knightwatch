@@ -2,17 +2,21 @@ import axios from 'axios';
 
 class Leaderboard {
     constructor() {
-        this.highscores =  [];
+        this.highscores =  {};
         this.leaderboardLength = 10;
     }
 
-    isHighscore(score) {
-        return this.highscores.length < this.leaderboardLength || score > this.highscores[this.highscores.length-1].score;
+    isHighscore(difficulty, score) {
+        let lowestScore = this.highscores[difficulty][this.highscores.length - 1];
+        // handle when no scores present
+        lowestScore = lowestScore !== undefined ? lowestScore : -1;
+        const currentLength = this.highscores[difficulty].length;
+        return currentLength < this.leaderboardLength || score > lowestScore.score;
     }
 
     getScores() {
         return axios.get("/api/highscores")
-            .then(scores => this.highscores = scores.data);
+            .then(scores => this.highscores = scores.data[0]);
     }
 
     postScore(userScore) {
@@ -21,7 +25,7 @@ class Leaderboard {
                 let newScore = res.data;
                 let newHighscores = [];
                 let newScoreAdded = false;
-                this.highscores.forEach(score => {
+                this.highscores[userScore.difficulty].forEach(score => {
                     if (score.score < newScore.score && !newScoreAdded) {
                         newHighscores.push(newScore);
                         newScoreAdded = true;
@@ -30,7 +34,7 @@ class Leaderboard {
                 });
                 if (!newScoreAdded) newHighscores.push(newScore);
                 if (newHighscores.length > this.leaderboardLength) newHighscores.pop();
-                this.highscores = newHighscores;
+                this.highscores[userScore.difficulty] = newHighscores;
             });
     }
 }

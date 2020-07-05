@@ -4,7 +4,7 @@ import World from "./world";
 import { IntervalTimer } from "../util/timers";
 
 class Game {
-  constructor() {
+  constructor(defaultDifficulty) {
     this.player = new Player(8, 16, {
       posX: 50,
       posY: 50,
@@ -20,11 +20,12 @@ class Game {
     this.bulletCollisionDetection = this.bulletCollisionDetection.bind(this);
 
     this.waveInProgress = false;
-    this.difficulty = 0;
+    this.wave = 0;
 
     this.interval;
 
     this.score = 0;
+    this.difficulty = defaultDifficulty;
   }
 
   update(timeStamp) {
@@ -80,13 +81,13 @@ class Game {
   }
 
   updateEnemyManager() {
-    // console.log(this.difficulty);
+    // console.log(this.wave);
     if (!this.waveInProgress && this.enemies.length === 0) {
       this.waveInProgress = true;
       this.player.heal(2);
       
-      this.difficulty++;
-      let enemyCount = Math.round(5 * this.difficulty);
+      this.wave++;
+      let enemyCount = Math.round(5 * this.wave);
 
       if (this.interval instanceof IntervalTimer) this.interval.pause();
       this.interval = new IntervalTimer(() => {
@@ -98,8 +99,9 @@ class Game {
                 posX: Math.random() * (this.world.width - 64) + 32,
                 posY: Math.random() * (this.world.height - 64) + 32,
                 velX: 0,
-                velY: 0 
-              }
+                velY: 0
+              },
+              this.difficulty
             )
           );
           enemyCount--;
@@ -107,7 +109,7 @@ class Game {
           this.waveInProgress = false;
           // window.clearInterval(this.interval);
         }
-      }, 2000 / this.difficulty);
+      }, 2000 / this.wave);
     }
 
   }

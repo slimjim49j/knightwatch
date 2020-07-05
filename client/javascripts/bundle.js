@@ -211,20 +211,25 @@ var Display = /*#__PURE__*/function () {
 
   _createClass(Display, [{
     key: "updateLeaderboard",
-    value: function updateLeaderboard(scores) {
-      var leaderboardList = document.querySelector(".leaderboard");
+    value: function updateLeaderboard(allScores) {
+      var selectedDifficulty = document.querySelector(".leaderboard-difficulty-radio:checked").value;
+      var leaderboardList = document.querySelector("#".concat(selectedDifficulty, "-leaderboard"));
+      var scores = allScores[selectedDifficulty];
+      document.querySelectorAll(".leaderboard").forEach(function (leaderboard) {
+        if (leaderboard === leaderboardList) leaderboard.classList.remove("hidden");else leaderboard.classList.add("hidden");
+      });
       leaderboardList.textContent = "";
 
       for (var i = 0; i < scores.length; i++) {
         var scoreLi = document.createElement("li"); // refactor?
 
         var nameSpan = document.createElement("span");
-        var difficultySpan = document.createElement("span");
+        var waveSpan = document.createElement("span");
         var scoreSpan = document.createElement("span");
         nameSpan.textContent = "Name: ".concat(scores[i].name);
-        difficultySpan.textContent = "Difficulty: ".concat(scores[i].difficulty);
+        waveSpan.textContent = "Wave: ".concat(scores[i].wave);
         scoreSpan.textContent = "Score: ".concat(scores[i].score);
-        scoreLi.append(nameSpan, difficultySpan, scoreSpan);
+        scoreLi.append(nameSpan, waveSpan, scoreSpan);
         leaderboardList.append(scoreLi);
       }
     }
@@ -233,6 +238,11 @@ var Display = /*#__PURE__*/function () {
     value: function toggleHighscoreModal() {
       var modalWrapperClassList = document.querySelector(".highscore-modal-wrapper").classList;
       if (Array.from(modalWrapperClassList).includes("hidden")) modalWrapperClassList.remove("hidden");else modalWrapperClassList.add("hidden");
+    }
+  }, {
+    key: "setDifficultySelectStatus",
+    value: function setDifficultySelectStatus(status) {
+      document.querySelector(".difficulty-select").disabled = !status;
     }
   }, {
     key: "updateAudioToggle",
@@ -413,14 +423,18 @@ var Leaderboard = /*#__PURE__*/function () {
   function Leaderboard() {
     _classCallCheck(this, Leaderboard);
 
-    this.highscores = [];
+    this.highscores = {};
     this.leaderboardLength = 10;
   }
 
   _createClass(Leaderboard, [{
     key: "isHighscore",
-    value: function isHighscore(score) {
-      return this.highscores.length < this.leaderboardLength || score > this.highscores[this.highscores.length - 1].score;
+    value: function isHighscore(difficulty, score) {
+      var lowestScore = this.highscores[difficulty][this.highscores.length - 1]; // handle when no scores present
+
+      lowestScore = lowestScore !== undefined ? lowestScore : -1;
+      var currentLength = this.highscores[difficulty].length;
+      return currentLength < this.leaderboardLength || score > lowestScore.score;
     }
   }, {
     key: "getScores",
@@ -428,7 +442,7 @@ var Leaderboard = /*#__PURE__*/function () {
       var _this = this;
 
       return axios__WEBPACK_IMPORTED_MODULE_0___default.a.get("/api/highscores").then(function (scores) {
-        return _this.highscores = scores.data;
+        return _this.highscores = scores.data[0];
       });
     }
   }, {
@@ -441,7 +455,7 @@ var Leaderboard = /*#__PURE__*/function () {
         var newHighscores = [];
         var newScoreAdded = false;
 
-        _this2.highscores.forEach(function (score) {
+        _this2.highscores[userScore.difficulty].forEach(function (score) {
           if (score.score < newScore.score && !newScoreAdded) {
             newHighscores.push(newScore);
             newScoreAdded = true;
@@ -452,7 +466,7 @@ var Leaderboard = /*#__PURE__*/function () {
 
         if (!newScoreAdded) newHighscores.push(newScore);
         if (newHighscores.length > _this2.leaderboardLength) newHighscores.pop();
-        _this2.highscores = newHighscores;
+        _this2.highscores[userScore.difficulty] = newHighscores;
       });
     }
   }]);
@@ -926,17 +940,37 @@ var Enemy = /*#__PURE__*/function (_Entities) {
 
   var _super = _createSuper(Enemy);
 
-  function Enemy(width, height, movement) {
+  function Enemy(width, height, movement, difficulty) {
     var _this;
 
     _classCallCheck(this, Enemy);
 
     var animatorParams = setupAnimatorParams();
     _this = _super.call(this, width, height, movement, animatorParams);
+    var calcFireInterval;
 
-    var calcFireInterval = function calcFireInterval() {
-      return Math.random() * 3000 + 500;
-    };
+    switch (difficulty) {
+      case "easy":
+        calcFireInterval = function calcFireInterval() {
+          return Math.random() * 7000 + 4000;
+        };
+
+        break;
+
+      case "medium":
+        calcFireInterval = function calcFireInterval() {
+          return Math.random() * 5000 + 2000;
+        };
+
+        break;
+
+      case "hard":
+        calcFireInterval = function calcFireInterval() {
+          return Math.random() * 3000 + 500;
+        };
+
+        break;
+    }
 
     _this.gun = new _gun__WEBPACK_IMPORTED_MODULE_1__["default"](5000, calcFireInterval, 5);
     _this.health = 5;
@@ -1238,7 +1272,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 var Game = /*#__PURE__*/function () {
-  function Game() {
+  function Game(defaultDifficulty) {
     _classCallCheck(this, Game);
 
     this.player = new _player__WEBPACK_IMPORTED_MODULE_1__["default"](8, 16, {
@@ -1252,9 +1286,10 @@ var Game = /*#__PURE__*/function () {
     this.world = new _world__WEBPACK_IMPORTED_MODULE_2__["default"]();
     this.bulletCollisionDetection = this.bulletCollisionDetection.bind(this);
     this.waveInProgress = false;
-    this.difficulty = 0;
+    this.wave = 0;
     this.interval;
     this.score = 0;
+    this.difficulty = defaultDifficulty;
   }
 
   _createClass(Game, [{
@@ -1312,12 +1347,12 @@ var Game = /*#__PURE__*/function () {
     value: function updateEnemyManager() {
       var _this3 = this;
 
-      // console.log(this.difficulty);
+      // console.log(this.wave);
       if (!this.waveInProgress && this.enemies.length === 0) {
         this.waveInProgress = true;
         this.player.heal(2);
-        this.difficulty++;
-        var enemyCount = Math.round(5 * this.difficulty);
+        this.wave++;
+        var enemyCount = Math.round(5 * this.wave);
         if (this.interval instanceof _util_timers__WEBPACK_IMPORTED_MODULE_3__["IntervalTimer"]) this.interval.pause();
         this.interval = new _util_timers__WEBPACK_IMPORTED_MODULE_3__["IntervalTimer"](function () {
           if (enemyCount > 0) {
@@ -1326,13 +1361,13 @@ var Game = /*#__PURE__*/function () {
               posY: Math.random() * (_this3.world.height - 64) + 32,
               velX: 0,
               velY: 0
-            }));
+            }, _this3.difficulty));
 
             enemyCount--;
           } else {
             _this3.waveInProgress = false; // window.clearInterval(this.interval);
           }
-        }, 2000 / this.difficulty);
+        }, 2000 / this.wave);
       }
     }
   }]);
@@ -1892,13 +1927,13 @@ var renderEndScreen = function renderEndScreen() {
   }, 500);
 };
 
-var difficultySpan = document.querySelector(".difficulty-span");
+var waveSpan = document.querySelector(".wave-span");
 var scoreSpan = document.querySelector(".score-span");
 
 var update = function update(timeStamp) {
   router();
   game.update(timeStamp);
-  difficultySpan.textContent = "Difficulty: ".concat(game.difficulty);
+  waveSpan.textContent = "Wave: ".concat(game.wave);
   scoreSpan.textContent = "Score: ".concat(game.score);
   if (game.player.health === 0) endGame();
 };
@@ -1913,20 +1948,25 @@ var router = function router() {
 var controller = new _controller__WEBPACK_IMPORTED_MODULE_0__["default"]();
 var display = new _controllers_display__WEBPACK_IMPORTED_MODULE_1__["default"](document.querySelector("canvas"));
 var engine = new _engine__WEBPACK_IMPORTED_MODULE_2__["default"](1000 / 30, update, render);
-var game = new _game_game__WEBPACK_IMPORTED_MODULE_3__["default"]();
+var game = new _game_game__WEBPACK_IMPORTED_MODULE_3__["default"](document.querySelector(".difficulty-select").value);
 var leaderboard = new _controllers_leaderboard__WEBPACK_IMPORTED_MODULE_4__["default"]();
 var sound = new _controllers_sound__WEBPACK_IMPORTED_MODULE_5__["default"]();
 display.buffer.canvas.height = game.world.height;
 display.buffer.canvas.width = game.world.width; // leaderboard logic
 
-leaderboard.getScores().then(function () {
-  return display.updateLeaderboard(leaderboard.highscores);
-});
+function updateLeaderboard() {
+  leaderboard.getScores().then(function () {
+    return display.updateLeaderboard(leaderboard.highscores);
+  });
+}
+
+updateLeaderboard();
 document.querySelector(".highscore-modal .exit-btn").addEventListener("click", display.toggleHighscoreModal);
 document.querySelector(".highscore-modal .submit-btn").addEventListener("click", function (e) {
   var name = document.querySelector(".name-field").value;
   leaderboard.postScore({
     name: name,
+    wave: game.wave,
     difficulty: game.difficulty,
     score: game.score
   }).then(function () {
@@ -1954,7 +1994,8 @@ function handleClick(e) {
   game.player.requestFire(e.offsetX * worldRatio, e.offsetY * worldRatio);
 }
 
-;
+; // audio toggle
+
 var audioPlaying = true;
 
 function handleAudioToggleClick() {
@@ -1964,6 +2005,14 @@ function handleAudioToggleClick() {
   display.updateAudioToggle(!audioPlaying);
 }
 
+document.querySelector(".leaderboard-radio-wrapper").addEventListener("change", function () {
+  updateLeaderboard();
+}); // difficulty dropdown
+
+var difficultySelect = document.querySelector(".difficulty-select");
+difficultySelect.addEventListener("change", function () {
+  if (play) return;else game.difficulty = difficultySelect.value;
+});
 window.addEventListener("resize", handleResize);
 window.addEventListener("keydown", handleKeyChange);
 window.addEventListener("keyup", handleKeyChange);
@@ -2045,7 +2094,7 @@ function pauseActivity() {
 }
 
 function endGame() {
-  if (leaderboard.isHighscore(game.score)) display.toggleHighscoreModal();
+  if (leaderboard.isHighscore(game.difficulty, game.score)) display.toggleHighscoreModal();
   pauseActivity();
   renderEndScreen();
   window.setTimeout(enableRestart, 1000);
@@ -2053,7 +2102,7 @@ function endGame() {
 
 
 function enableRestart() {
-  document.querySelector("#main").addEventListener("click", function (e) {
+  document.querySelector("#main").addEventListener("click", function () {
     location.reload();
   });
 } // click to start
@@ -2063,6 +2112,7 @@ function enableStart() {
   renderStartScreen();
   document.querySelector("#main").addEventListener("click", function start(e) {
     togglePlay(e);
+    display.setDifficultySelectStatus(false);
     document.querySelector("#main").removeEventListener("click", start);
   });
 }

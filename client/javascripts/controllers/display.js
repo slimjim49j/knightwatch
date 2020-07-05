@@ -17,22 +17,30 @@ class Display {
     this.render = this.render.bind(this);
   }
 
-  updateLeaderboard(scores) {
-    const leaderboardList = document.querySelector(".leaderboard");
+  updateLeaderboard(allScores) {
+    const selectedDifficulty = document.querySelector(".leaderboard-difficulty-radio:checked").value;
+    const leaderboardList = document.querySelector(`#${selectedDifficulty}-leaderboard`);
+    const scores = allScores[selectedDifficulty];
+
+    document.querySelectorAll(".leaderboard").forEach(leaderboard => {
+      if (leaderboard === leaderboardList) leaderboard.classList.remove("hidden");
+      else leaderboard.classList.add("hidden");
+    });
     leaderboardList.textContent = "";
+    
     for (let i=0; i<scores.length; i++) {
       const scoreLi = document.createElement("li");
       
       // refactor?
       const nameSpan = document.createElement("span");
-      const difficultySpan = document.createElement("span");
+      const waveSpan = document.createElement("span");
       const scoreSpan = document.createElement("span");
 
       nameSpan.textContent = `Name: ${scores[i].name}`;
-      difficultySpan.textContent = `Difficulty: ${scores[i].difficulty}`;
+      waveSpan.textContent = `Wave: ${scores[i].wave}`;
       scoreSpan.textContent = `Score: ${scores[i].score}`;
 
-      scoreLi.append(nameSpan, difficultySpan, scoreSpan);
+      scoreLi.append(nameSpan, waveSpan, scoreSpan);
       leaderboardList.append(scoreLi);
     }
   }
@@ -41,6 +49,10 @@ class Display {
     const modalWrapperClassList = document.querySelector(".highscore-modal-wrapper").classList;
     if (Array.from(modalWrapperClassList).includes("hidden")) modalWrapperClassList.remove("hidden");
     else modalWrapperClassList.add("hidden");
+  }
+
+  setDifficultySelectStatus(status) {
+    document.querySelector(".difficulty-select").disabled = !status;
   }
 
   updateAudioToggle(audioPlaying) {

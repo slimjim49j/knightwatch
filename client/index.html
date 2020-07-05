@@ -14,7 +14,21 @@
     <h1 class="glow-text">KnightWatch</h1>
 
     <h2>Leaderboard</h2>
-    <ul class="leaderboard">
+    <!-- <span class="leaderboard-difficulty-span">Difficulty:</span> -->
+    <div class="leaderboard-radio-wrapper">
+        <input type="radio" name="difficulty" id="leaderboard-difficulty-easy" class="leaderboard-difficulty-radio" value="easy" checked>
+        <label for="leaderboard-difficulty-easy">Easy</label>
+        <input type="radio" name="difficulty" id="leaderboard-difficulty-medium" class="leaderboard-difficulty-radio" value="medium">
+        <label for="leaderboard-difficulty-medium">Medium</label>
+        <input type="radio" name="difficulty" id="leaderboard-difficulty-hard" class="leaderboard-difficulty-radio" value="hard">
+        <label for="leaderboard-difficulty-hard">Hard</label>
+        <!-- naming convention varies, leaderboard-diff-hard &, hard-leaderboard -->
+    </div>
+    <ul id="easy-leaderboard" class="leaderboard">
+    </ul>
+    <ul id="medium-leaderboard" class="leaderboard">
+    </ul>
+    <ul id="hard-leaderboard" class="leaderboard">
     </ul>
     
     <main class="game-wrapper">
@@ -24,8 +38,15 @@
                     <input type="checkbox" name="" id="">
                     <span>Play</span>
                 </label>
-                <span class="score-span">Score:</span>
-                <span class="difficulty-span">Difficulty:</span>
+                <span class="score-span">Score: </span>
+                <span class="wave-span">Wave: </span>
+
+                <label for="difficulty" class="difficulty-label">Difficulty:</label>
+                <select name="difficulty" class="difficulty-select">
+                    <option value="easy" selected>Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
             </div>
             <div class="right-info">
                 <button class="audio-toggle">Audio:</button>

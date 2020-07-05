@@ -3,11 +3,22 @@ import Gun from "./gun";
 import FrameManager from "./frame_manager";
 
 class Enemy extends Entities {
-  constructor(width, height, movement) {
+  constructor(width, height, movement, difficulty) {
     const animatorParams = setupAnimatorParams();
     super(width, height, movement, animatorParams);
 
-    const calcFireInterval = () => Math.random() * 3000 + 500;
+    let calcFireInterval;
+    switch(difficulty) {
+      case "easy":
+        calcFireInterval = () => Math.random() * 7000 + 4000;
+        break;
+      case "medium":
+        calcFireInterval = () => Math.random() * 5000 + 2000;
+        break;
+      case "hard":
+        calcFireInterval = () => Math.random() * 3000 + 500;
+        break;
+    }
     this.gun = new Gun(5000, calcFireInterval, 5);
 
     this.health = 5;

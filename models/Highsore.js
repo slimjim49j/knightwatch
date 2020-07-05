@@ -10,8 +10,12 @@ const HighscoreSchema = new Schema({
         type: Number,
         required: true
     },
-    difficulty: {
+    wave: {
         type: Number,
+        required: true
+    },
+    difficulty: {
+        type: String,
         required: true
     },
 });
