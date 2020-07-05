@@ -430,10 +430,13 @@ var Leaderboard = /*#__PURE__*/function () {
   _createClass(Leaderboard, [{
     key: "isHighscore",
     value: function isHighscore(difficulty, score) {
-      var lowestScore = this.highscores[difficulty][this.highscores.length - 1]; // handle when no scores present
+      var scores = this.highscores[difficulty];
+      var lowestScore = scores[scores.length - 1]; // handle when no scores present
 
-      lowestScore = lowestScore !== undefined ? lowestScore : -1;
-      var currentLength = this.highscores[difficulty].length;
+      lowestScore = lowestScore === undefined ? {
+        score: -1
+      } : lowestScore;
+      var currentLength = scores.length;
       return currentLength < this.leaderboardLength || score > lowestScore.score;
     }
   }, {

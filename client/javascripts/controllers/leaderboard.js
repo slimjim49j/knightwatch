@@ -7,10 +7,11 @@ class Leaderboard {
     }
 
     isHighscore(difficulty, score) {
-        let lowestScore = this.highscores[difficulty][this.highscores.length - 1];
+        const scores = this.highscores[difficulty]
+        let lowestScore = scores[scores.length - 1];
         // handle when no scores present
-        lowestScore = lowestScore !== undefined ? lowestScore : -1;
-        const currentLength = this.highscores[difficulty].length;
+        lowestScore = lowestScore === undefined ? { score: -1 } : lowestScore;
+        const currentLength = scores.length;
         return currentLength < this.leaderboardLength || score > lowestScore.score;
     }
 
