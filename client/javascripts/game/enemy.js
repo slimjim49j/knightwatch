@@ -24,6 +24,8 @@ class Enemy extends Entities {
     this.health = 5;
     this.despawn = false;
     this.active = true;
+
+    this.sound = "";
   }
 
   requestFire(targetX, targetY) {
@@ -75,6 +77,8 @@ class Enemy extends Entities {
     
     this.movement.velX += knockbackVel * Math.cos(angle);
     this.movement.velY += knockbackVel * Math.sin(angle);
+
+    this.sound = "hurt";
   }
 
   updateOrientation() {

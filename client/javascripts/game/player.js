@@ -10,6 +10,8 @@ class Player extends Entities {
     this.gun = new Gun(5000, () => 300, 5);
     this.health = 10;
     this.maxHealth = 10;
+
+    this.sound = "";
   }
 
   requestFire(mouseX, mouseY) {
@@ -44,6 +46,8 @@ class Player extends Entities {
 
     this.movement.velX += knockbackVel * Math.cos(angle);
     this.movement.velY += knockbackVel * Math.sin(angle);
+
+    this.sound = "hurt";
   }
 
   heal(healAmt) {

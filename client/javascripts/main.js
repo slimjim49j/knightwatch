@@ -73,6 +73,18 @@ const render = function() {
   display.drawHealth(game.world.width, game.world.height, game.player.health, game.player.maxHealth);
   
   display.render();
+
+  if (game.player.sound === "hurt") {
+    sound.playerHurt();
+    game.player.sound = "";
+  }
+
+  game.enemies.forEach(enemy => {
+    if (enemy.sound === "hurt") {
+      sound.enemyHurt();
+      enemy.sound = "";
+    }
+  })
 };
 
 const renderStartScreen = function() {

@@ -1,14 +1,13 @@
 import * as Tone from "tone";
-const tetrisTheme = require("./tetris_theme.json");
+const tetrisTheme = require("../../audio/tetris_theme.json");
 
 class Sound {
     constructor() {
+        this.userPlayer = new Tone.Player("../../audio/Player_hurt1.ogg").toMaster();
+        this.enemyPlayer = new Tone.Player("../../audio/Zombie_hurt1.ogg").toMaster();
     }
 
-    // async start() {
-    //     await Tone.start();
-    //     console.log("ready");
-    // }
+    // background music
     createSynth() {
         //create a synth and connect it to the master output (your speakers)
         this.synth = new Tone.PolySynth(4, Tone.Synth, { oscillator: { type: "sawtooth" } }).toMaster();
@@ -45,6 +44,16 @@ class Sound {
 
     isPlaying() {
         return Tone.Transport.state === "started";
+    }
+
+
+    // sound effects 
+    playerHurt() {
+        this.userPlayer.start();
+    }
+
+    enemyHurt() {
+        this.enemyPlayer.start();
     }
 }
 
