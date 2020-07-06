@@ -188,15 +188,18 @@ function handleClick(e) {
 };
 
 // audio toggle
-let audioPlaying = true;
+let audioStatus = true;
 function handleAudioToggleClick() {
-  if (!play) return;
+  if (play) {
+    const audioPlaying = sound.isPlaying();
+    audioStatus = !audioPlaying;
+    if (audioPlaying) sound.pause();
+    else sound.start();
+  } else {
+    audioStatus = !audioStatus;
+  }
 
-  const audioPlaying = sound.isPlaying();
-  if (audioPlaying) sound.pause();
-  else sound.start();
-
-  display.updateAudioToggle(!audioPlaying);
+  display.updateAudioToggle(audioStatus);
 }
 
 document.querySelector(".leaderboard-radio-wrapper").addEventListener("change", () => {
@@ -252,8 +255,6 @@ function togglePlay(e) {
     pauseActivity();
     playToggleSpan.textContent = "Play"
   }
-
-  display.updateAudioToggle(sound.isPlaying());
 }
 
 // guns, bullets, enemy manager
@@ -277,7 +278,8 @@ function resumeActivity() {
   if (game.interval) game.interval.resume();
 
   // sound
-  sound.start();
+  if (audioStatus) sound.start();
+  display.updateAudioToggle(sound.isPlaying());
 }
 
 function pauseActivity() {
