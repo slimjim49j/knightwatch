@@ -256,10 +256,10 @@ var Display = /*#__PURE__*/function () {
       document.querySelector(".difficulty-select").disabled = !status;
     }
   }, {
-    key: "updateAudioToggle",
-    value: function updateAudioToggle(audioPlaying) {
-      var audioToggle = document.querySelector(".audio-toggle");
-      if (audioPlaying) audioToggle.textContent = "Audio: On";else audioToggle.textContent = "Audio: Off";
+    key: "updateMusicToggle",
+    value: function updateMusicToggle(musicPlaying) {
+      var musicToggle = document.querySelector(".music-toggle");
+      if (musicPlaying) musicToggle.textContent = "Music: On";else musicToggle.textContent = "Music: Off";
     }
   }, {
     key: "renderColor",
@@ -649,7 +649,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 // fixed time step game loop
 //   ensures that game gets updated at constant rate
 var Engine = /*#__PURE__*/function () {
-  function Engine(timeStep, update, render) {
+  function Engine(timeStep, update, render, playSound) {
     _classCallCheck(this, Engine);
 
     this.accumulatedTime = 0;
@@ -659,6 +659,7 @@ var Engine = /*#__PURE__*/function () {
     this.updated = false;
     this.update = update;
     this.render = render;
+    this.playSound = playSound;
     this.run = this.run.bind(this);
     this.run = this.run.bind(this);
     this.start = this.start.bind(this);
@@ -691,6 +692,7 @@ var Engine = /*#__PURE__*/function () {
       if (this.updated) {
         this.updated = false;
         this.render(timeStamp);
+        this.playSound();
       }
     }
   }, {
@@ -1904,18 +1906,6 @@ var render = function render() {
 
   display.drawHealth(game.world.width, game.world.height, game.player.health, game.player.maxHealth);
   display.render();
-
-  if (game.player.sound === "hurt") {
-    sound.playerHurt();
-    game.player.sound = "";
-  }
-
-  game.enemies.forEach(function (enemy) {
-    if (enemy.sound === "hurt") {
-      sound.enemyHurt();
-      enemy.sound = "";
-    }
-  });
 };
 
 var renderStartScreen = function renderStartScreen() {
@@ -1956,7 +1946,25 @@ var renderEndScreen = function renderEndScreen() {
     });
     display.render();
   }, 500);
-};
+}; // sound effects
+
+
+function playSound() {
+  if (!musicStatus) return;
+
+  if (game.player.sound === "hurt") {
+    sound.playerHurt();
+    game.player.sound = "";
+  }
+
+  game.enemies.forEach(function (enemy) {
+    if (enemy.sound === "hurt") {
+      sound.enemyHurt();
+      enemy.sound = "";
+    }
+  });
+} // update
+
 
 var waveSpan = document.querySelector(".wave-span");
 var scoreSpan = document.querySelector(".score-span");
@@ -1979,7 +1987,7 @@ function router() {
 ;
 var controller = new _controller__WEBPACK_IMPORTED_MODULE_0__["default"]();
 var display = new _controllers_display__WEBPACK_IMPORTED_MODULE_1__["default"](document.querySelector("canvas"));
-var engine = new _engine__WEBPACK_IMPORTED_MODULE_2__["default"](1000 / 30, update, render);
+var engine = new _engine__WEBPACK_IMPORTED_MODULE_2__["default"](1000 / 30, update, render, playSound);
 var game = new _game_game__WEBPACK_IMPORTED_MODULE_3__["default"](document.querySelector(".difficulty-select").value);
 var leaderboard = new _controllers_leaderboard__WEBPACK_IMPORTED_MODULE_4__["default"]();
 var sound = new _controllers_sound__WEBPACK_IMPORTED_MODULE_5__["default"]();
@@ -2029,18 +2037,18 @@ function handleClick(e) {
 
 ; // audio toggle
 
-var audioStatus = true;
+var musicStatus = true;
 
-function handleAudioToggleClick() {
+function handleMusicToggleClick() {
   if (play) {
     var audioPlaying = sound.isPlaying();
-    audioStatus = !audioPlaying;
+    musicStatus = !audioPlaying;
     if (audioPlaying) sound.pause();else sound.start();
   } else {
-    audioStatus = !audioStatus;
+    musicStatus = !musicStatus;
   }
 
-  display.updateAudioToggle(audioStatus);
+  display.updateMusicToggle(musicStatus);
 }
 
 document.querySelector(".leaderboard-radio-wrapper").addEventListener("change", function () {
@@ -2055,7 +2063,7 @@ window.addEventListener("resize", handleResize);
 window.addEventListener("keydown", handleKeyChange);
 window.addEventListener("keyup", handleKeyChange);
 window.addEventListener("click", handleClick);
-document.querySelector(".audio-toggle").addEventListener("click", handleAudioToggleClick); // handle start / stop game play
+document.querySelector(".music-toggle").addEventListener("click", handleMusicToggleClick); // handle start / stop game play
 
 var imgLoaded = false;
 display.tileSheet.image.addEventListener("load", function () {
@@ -2104,8 +2112,8 @@ function resumeActivity() {
 
   if (game.interval) game.interval.resume(); // sound
 
-  if (audioStatus) sound.start();
-  display.updateAudioToggle(sound.isPlaying());
+  if (musicStatus) sound.start();
+  display.updateMusicToggle(sound.isPlaying());
 }
 
 function pauseActivity() {

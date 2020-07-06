@@ -73,18 +73,6 @@ const render = function() {
   display.drawHealth(game.world.width, game.world.height, game.player.health, game.player.maxHealth);
   
   display.render();
-
-  if (game.player.sound === "hurt") {
-    sound.playerHurt();
-    game.player.sound = "";
-  }
-
-  game.enemies.forEach(enemy => {
-    if (enemy.sound === "hurt") {
-      sound.enemyHurt();
-      enemy.sound = "";
-    }
-  })
 };
 
 const renderStartScreen = function() {
@@ -128,6 +116,28 @@ const renderEndScreen = function() {
   }, 500);
 };
 
+
+
+// sound effects
+function playSound() {
+  if (!musicStatus) return;
+
+  if (game.player.sound === "hurt") {
+    sound.playerHurt();
+    game.player.sound = "";
+  }
+
+  game.enemies.forEach(enemy => {
+    if (enemy.sound === "hurt") {
+      sound.enemyHurt();
+      enemy.sound = "";
+    }
+  })
+}
+
+
+
+// update
 const waveSpan = document.querySelector(".wave-span");
 const scoreSpan = document.querySelector(".score-span");
 const update = function(timeStamp) {
@@ -151,7 +161,7 @@ function router() {
 
 let controller = new Controller();
 let display = new Display(document.querySelector("canvas"));
-let engine = new Engine(1000 / 30, update, render);
+let engine = new Engine(1000 / 30, update, render, playSound);
 let game = new Game(document.querySelector(".difficulty-select").value);
 let leaderboard = new Leaderboard();
 let sound = new Sound();
@@ -202,18 +212,18 @@ function handleClick(e) {
 };
 
 // audio toggle
-let audioStatus = true;
-function handleAudioToggleClick() {
+let musicStatus = true;
+function handleMusicToggleClick() {
   if (play) {
     const audioPlaying = sound.isPlaying();
-    audioStatus = !audioPlaying;
+    musicStatus = !audioPlaying;
     if (audioPlaying) sound.pause();
     else sound.start();
   } else {
-    audioStatus = !audioStatus;
+    musicStatus = !musicStatus;
   }
 
-  display.updateAudioToggle(audioStatus);
+  display.updateMusicToggle(musicStatus);
 }
 
 document.querySelector(".leaderboard-radio-wrapper").addEventListener("change", () => {
@@ -231,7 +241,7 @@ window.addEventListener("resize", handleResize);
 window.addEventListener("keydown", handleKeyChange);
 window.addEventListener("keyup", handleKeyChange);
 window.addEventListener("click", handleClick);
-document.querySelector(".audio-toggle").addEventListener("click", handleAudioToggleClick);
+document.querySelector(".music-toggle").addEventListener("click", handleMusicToggleClick);
 
 
 
@@ -295,8 +305,8 @@ function resumeActivity() {
   if (game.interval) game.interval.resume();
 
   // sound
-  if (audioStatus) sound.start();
-  display.updateAudioToggle(sound.isPlaying());
+  if (musicStatus) sound.start();
+  display.updateMusicToggle(sound.isPlaying());
 }
 
 function pauseActivity() {

@@ -2,7 +2,7 @@
 //   ensures that game gets updated at constant rate
 
 class Engine {
-  constructor(timeStep, update, render) {
+  constructor(timeStep, update, render, playSound) {
     this.accumulatedTime = 0;
     this.animationFrameRequest = undefined;
     this.time = undefined;
@@ -12,6 +12,7 @@ class Engine {
 
     this.update = update;
     this.render = render;
+    this.playSound = playSound;
 
     this.run = this.run.bind(this);
 
@@ -47,6 +48,7 @@ class Engine {
     if (this.updated) {
       this.updated = false;
       this.render(timeStamp);
+      this.playSound();
     }
   }
 
