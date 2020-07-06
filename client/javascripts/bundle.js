@@ -1892,6 +1892,7 @@ var render = function render() {
 };
 
 var renderStartScreen = function renderStartScreen() {
+  display.renderColor("black");
   display.drawText({
     text: "KnightWatch",
     font: "30px Adventurer",
@@ -1941,13 +1942,14 @@ var update = function update(timeStamp) {
   if (game.player.health === 0) endGame();
 };
 
-var router = function router() {
+function router() {
   if (controller.keys.up.active) game.player.moveUp(0.5);
   if (controller.keys.right.active) game.player.moveRight(0.5);
   if (controller.keys.down.active) game.player.moveDown(0.5);
   if (controller.keys.left.active) game.player.moveLeft(0.5);
-};
+}
 
+;
 var controller = new _controller__WEBPACK_IMPORTED_MODULE_0__["default"]();
 var display = new _controllers_display__WEBPACK_IMPORTED_MODULE_1__["default"](document.querySelector("canvas"));
 var engine = new _engine__WEBPACK_IMPORTED_MODULE_2__["default"](1000 / 30, update, render);
@@ -1963,7 +1965,8 @@ function updateLeaderboard() {
   });
 }
 
-updateLeaderboard();
+updateLeaderboard(); // highscore modal
+
 document.querySelector(".highscore-modal .exit-btn").addEventListener("click", display.toggleHighscoreModal);
 document.querySelector(".highscore-modal .submit-btn").addEventListener("click", function (e) {
   var name = document.querySelector(".name-field").value;
@@ -2036,15 +2039,14 @@ display.tileSheet.image.addEventListener("load", function () {
 });
 var play = false;
 var playToggleCheckbox = document.querySelector(".play-toggle-label input");
-var playToggleSpan = document.querySelector(".play-toggle-label span");
 playToggleCheckbox.addEventListener("change", togglePlay);
 
 function togglePlay(e) {
   e.stopPropagation();
   if (game.player.health === 0) return;
-  play = !play;
+  var playToggleSpan = document.querySelector(".play-toggle-label span"); // play = !play;
 
-  if (imgLoaded && play) {
+  if (imgLoaded && !play) {
     resumeActivity();
     playToggleSpan.textContent = "Pause";
   } else {
@@ -2056,7 +2058,8 @@ function togglePlay(e) {
 
 function resumeActivity() {
   document.querySelector(".game-wrapper").scrollIntoView();
-  engine.start(); // resume bullet expiration
+  engine.start();
+  play = true; // resume bullet expiration
 
   game.player.gun.bullets.forEach(function (bullet) {
     return bullet.expirationTimer.resume();
@@ -2079,7 +2082,8 @@ function resumeActivity() {
 }
 
 function pauseActivity() {
-  engine.stop(); // pause bullet expiration
+  engine.stop();
+  play = false; // pause bullet expiration
 
   game.player.gun.bullets.forEach(function (bullet) {
     return bullet.expirationTimer.pause();
@@ -2104,23 +2108,30 @@ function endGame() {
   if (leaderboard.isHighscore(game.difficulty, game.score)) display.toggleHighscoreModal();
   pauseActivity();
   renderEndScreen();
+  var playToggleSpan = document.querySelector(".play-toggle-label span");
+  playToggleSpan.textContent = "Start";
   window.setTimeout(enableRestart, 1000);
 } // restart
 
 
 function enableRestart() {
-  document.querySelector("#main").addEventListener("click", function () {
-    location.reload();
+  var main = document.querySelector("#main");
+  main.addEventListener("click", function restart() {
+    main.removeEventListener("click", restart);
+    game = new _game_game__WEBPACK_IMPORTED_MODULE_3__["default"](document.querySelector(".difficulty-select").value);
+    display.setDifficultySelectStatus(true);
+    enableStart();
   });
 } // click to start
 
 
 function enableStart() {
   renderStartScreen();
-  document.querySelector("#main").addEventListener("click", function start(e) {
+  var main = document.querySelector("#main");
+  main.addEventListener("click", function start(e) {
+    main.removeEventListener("click", start);
     togglePlay(e);
     display.setDifficultySelectStatus(false);
-    document.querySelector("#main").removeEventListener("click", start);
   });
 }
 

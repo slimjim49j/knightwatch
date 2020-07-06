@@ -76,6 +76,7 @@ const render = function() {
 };
 
 const renderStartScreen = function() {
+  display.renderColor("black");
   display.drawText({
     text: "KnightWatch",
     font: "30px Adventurer",
@@ -127,7 +128,7 @@ const update = function(timeStamp) {
   if (game.player.health === 0) endGame();
 };
 
-const router = function() {
+function router() {
   if (controller.keys.up.active) game.player.moveUp(0.5);
   if (controller.keys.right.active) game.player.moveRight(0.5);
   if (controller.keys.down.active) game.player.moveDown(0.5);
@@ -136,12 +137,12 @@ const router = function() {
 
 
 
-const controller = new Controller();
-const display = new Display(document.querySelector("canvas"));
-const engine = new Engine(1000 / 30, update, render);
-const game = new Game(document.querySelector(".difficulty-select").value);
-const leaderboard = new Leaderboard();
-const sound = new Sound();
+let controller = new Controller();
+let display = new Display(document.querySelector("canvas"));
+let engine = new Engine(1000 / 30, update, render);
+let game = new Game(document.querySelector(".difficulty-select").value);
+let leaderboard = new Leaderboard();
+let sound = new Sound();
 
 display.buffer.canvas.height = game.world.height;
 display.buffer.canvas.width = game.world.width;
@@ -153,6 +154,7 @@ function updateLeaderboard() {
 }
 updateLeaderboard();
 
+// highscore modal
 document.querySelector(".highscore-modal .exit-btn").addEventListener("click", display.toggleHighscoreModal);
 document.querySelector(".highscore-modal .submit-btn").addEventListener("click", e => {
   const name = document.querySelector(".name-field").value;
@@ -238,15 +240,16 @@ display.tileSheet.image.addEventListener("load", () => {
 
 let play = false;
 const playToggleCheckbox = document.querySelector(".play-toggle-label input");
-const playToggleSpan = document.querySelector(".play-toggle-label span");
 playToggleCheckbox.addEventListener("change", togglePlay);
 
 function togglePlay(e) {
   e.stopPropagation();
   if (game.player.health === 0) return;
 
-  play = !play;
-  if (imgLoaded && play) {
+  const playToggleSpan = document.querySelector(".play-toggle-label span");
+
+  // play = !play;
+  if (imgLoaded && !play) {
 
     resumeActivity();
     playToggleSpan.textContent = "Pause"
@@ -261,6 +264,8 @@ function togglePlay(e) {
 function resumeActivity() {
   document.querySelector(".game-wrapper").scrollIntoView();
   engine.start();
+
+  play = true;
 
   // resume bullet expiration
   game.player.gun.bullets.forEach(bullet => bullet.expirationTimer.resume());
@@ -285,6 +290,8 @@ function resumeActivity() {
 function pauseActivity() {
   engine.stop();
 
+  play = false;
+
   // pause bullet expiration
   game.player.gun.bullets.forEach(bullet => bullet.expirationTimer.pause());
   game.enemies.forEach(enemy => (
@@ -306,15 +313,25 @@ function pauseActivity() {
 
 function endGame() {
   if (leaderboard.isHighscore(game.difficulty, game.score)) display.toggleHighscoreModal();
+
   pauseActivity();
   renderEndScreen();
+
+  const playToggleSpan = document.querySelector(".play-toggle-label span");
+  playToggleSpan.textContent = "Start";
+  
   window.setTimeout(enableRestart, 1000);
 }
 
 // restart
 function enableRestart() {
-  document.querySelector("#main").addEventListener("click", () => {
-    location.reload();
+  const main = document.querySelector("#main");
+  main.addEventListener("click", function restart() {
+    main.removeEventListener("click", restart);
+
+    game = new Game(document.querySelector(".difficulty-select").value);
+    display.setDifficultySelectStatus(true);
+    enableStart();
   })
 }
 
@@ -322,12 +339,13 @@ function enableRestart() {
 // click to start
 function enableStart() {
   renderStartScreen();
-  document.querySelector("#main").addEventListener("click", function start(e) {
+  const main = document.querySelector("#main");
+  main.addEventListener("click", function start(e) {
+    main.removeEventListener("click", start);
+
     togglePlay(e);
 
     display.setDifficultySelectStatus(false);
-
-    document.querySelector("#main").removeEventListener("click", start);
   })
 }
 
