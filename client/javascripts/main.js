@@ -232,6 +232,7 @@ function handleSoundClick() {
   display.updateSoundToggle(soundStatus);
 }
 display.updateSoundToggle(sound);
+display.updateMusicToggle(musicStatus);
 
 document.querySelector(".leaderboard-radio-wrapper").addEventListener("change", () => {
   updateLeaderboard();

@@ -3,8 +3,13 @@ const tetrisTheme = require("../../audio/tetris_theme.json");
 
 class Sound {
     constructor() {
-        this.userPlayer = new Tone.Player("../../audio/Player_hurt1.ogg").toMaster();
-        this.enemyPlayer = new Tone.Player("../../audio/Zombie_hurt1.ogg").toMaster();
+        this.player = new Tone.Players(
+            {
+                enemyHurt1: "../../audio/Zombie_hurt1.ogg",
+                enemyHurt2: "../../audio/Zombie_hurt2.ogg",
+                playerHurt1: "../../audio/Player_hurt1.ogg",
+            }
+        ).toMaster();
     }
 
     // background music
@@ -49,11 +54,11 @@ class Sound {
 
     // sound effects 
     playerHurt() {
-        this.userPlayer.start();
+        this.player.get("playerHurt1").start();
     }
 
     enemyHurt() {
-        this.enemyPlayer.start();
+        this.player.get(Math.round(Math.random()) ? "enemyHurt1" : "enemyHurt2").start();
     }
 }
 

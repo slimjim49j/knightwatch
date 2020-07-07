@@ -523,8 +523,11 @@ var Sound = /*#__PURE__*/function () {
   function Sound() {
     _classCallCheck(this, Sound);
 
-    this.userPlayer = new tone__WEBPACK_IMPORTED_MODULE_0__["Player"]("../../audio/Player_hurt1.ogg").toMaster();
-    this.enemyPlayer = new tone__WEBPACK_IMPORTED_MODULE_0__["Player"]("../../audio/Zombie_hurt1.ogg").toMaster();
+    this.player = new tone__WEBPACK_IMPORTED_MODULE_0__["Players"]({
+      enemyHurt1: "../../audio/Zombie_hurt1.ogg",
+      enemyHurt2: "../../audio/Zombie_hurt2.ogg",
+      playerHurt1: "../../audio/Player_hurt1.ogg"
+    }).toMaster();
   } // background music
 
 
@@ -578,12 +581,12 @@ var Sound = /*#__PURE__*/function () {
   }, {
     key: "playerHurt",
     value: function playerHurt() {
-      this.userPlayer.start();
+      this.player.get("playerHurt1").start();
     }
   }, {
     key: "enemyHurt",
     value: function enemyHurt() {
-      this.enemyPlayer.start();
+      this.player.get(Math.round(Math.random()) ? "enemyHurt1" : "enemyHurt2").start();
     }
   }]);
 
@@ -2065,6 +2068,7 @@ function handleSoundClick() {
 }
 
 display.updateSoundToggle(sound);
+display.updateMusicToggle(musicStatus);
 document.querySelector(".leaderboard-radio-wrapper").addEventListener("change", function () {
   updateLeaderboard();
 }); // difficulty dropdown
