@@ -142,7 +142,7 @@ h1 {
     cursor: default;
 }
 
-.music-toggle {
+.music-toggle, .sound-toggle {
     background-color: transparent;
     font-size: 25px;
     float: right;

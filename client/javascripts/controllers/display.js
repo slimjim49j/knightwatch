@@ -55,6 +55,12 @@ class Display {
     document.querySelector(".difficulty-select").disabled = !status;
   }
 
+  updateSoundToggle(soundPlaying) {
+    const soundToggle = document.querySelector(".sound-toggle");
+    if (soundPlaying) soundToggle.textContent = "Sound: On";
+    else soundToggle.textContent = "Sound: Off";
+  }
+
   updateMusicToggle(musicPlaying) {
     const musicToggle = document.querySelector(".music-toggle");
     if (musicPlaying) musicToggle.textContent = "Music: On";

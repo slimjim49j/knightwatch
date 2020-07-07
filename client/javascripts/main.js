@@ -120,7 +120,7 @@ const renderEndScreen = function() {
 
 // sound effects
 function playSound() {
-  if (!musicStatus) return;
+  if (!soundStatus) return;
 
   if (game.player.sound === "hurt") {
     sound.playerHurt();
@@ -211,20 +211,27 @@ function handleClick(e) {
   game.player.requestFire(e.offsetX * worldRatio, e.offsetY * worldRatio);
 };
 
-// audio toggle
+// music toggle
 let musicStatus = true;
-function handleMusicToggleClick() {
+function handleMusicClick() {
   if (play) {
-    const audioPlaying = sound.isPlaying();
+    const audioPlaying = sound.isPlayingMusic();
     musicStatus = !audioPlaying;
-    if (audioPlaying) sound.pause();
-    else sound.start();
+    if (audioPlaying) sound.pauseMusic();
+    else sound.startMusic();
   } else {
     musicStatus = !musicStatus;
   }
 
   display.updateMusicToggle(musicStatus);
 }
+
+let soundStatus = true;
+function handleSoundClick() {
+  soundStatus = !soundStatus;
+  display.updateSoundToggle(soundStatus);
+}
+display.updateSoundToggle(sound);
 
 document.querySelector(".leaderboard-radio-wrapper").addEventListener("change", () => {
   updateLeaderboard();
@@ -241,7 +248,8 @@ window.addEventListener("resize", handleResize);
 window.addEventListener("keydown", handleKeyChange);
 window.addEventListener("keyup", handleKeyChange);
 window.addEventListener("click", handleClick);
-document.querySelector(".music-toggle").addEventListener("click", handleMusicToggleClick);
+document.querySelector(".music-toggle").addEventListener("click", handleMusicClick);
+document.querySelector(".sound-toggle").addEventListener("click", handleSoundClick);
 
 
 
@@ -305,8 +313,8 @@ function resumeActivity() {
   if (game.interval) game.interval.resume();
 
   // sound
-  if (musicStatus) sound.start();
-  display.updateMusicToggle(sound.isPlaying());
+  if (musicStatus) sound.startMusic();
+  display.updateMusicToggle(sound.isPlayingMusic());
 }
 
 function pauseActivity() {
@@ -330,7 +338,7 @@ function pauseActivity() {
   game.interval.pause();
 
   // sound
-  sound.pause();
+  sound.pauseMusic();
 }
 
 function endGame() {

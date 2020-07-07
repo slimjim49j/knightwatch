@@ -256,6 +256,12 @@ var Display = /*#__PURE__*/function () {
       document.querySelector(".difficulty-select").disabled = !status;
     }
   }, {
+    key: "updateSoundToggle",
+    value: function updateSoundToggle(soundPlaying) {
+      var soundToggle = document.querySelector(".sound-toggle");
+      if (soundPlaying) soundToggle.textContent = "Sound: On";else soundToggle.textContent = "Sound: Off";
+    }
+  }, {
     key: "updateMusicToggle",
     value: function updateMusicToggle(musicPlaying) {
       var musicToggle = document.querySelector(".music-toggle");
@@ -552,20 +558,20 @@ var Sound = /*#__PURE__*/function () {
       this.part.loopEnd = 135;
     }
   }, {
-    key: "start",
-    value: function start() {
+    key: "startMusic",
+    value: function startMusic() {
       if (!this.synth) this.createSynth();
       if (!this.part) this.createPart();
       tone__WEBPACK_IMPORTED_MODULE_0__["Transport"].start();
     }
   }, {
-    key: "pause",
-    value: function pause() {
+    key: "pauseMusic",
+    value: function pauseMusic() {
       tone__WEBPACK_IMPORTED_MODULE_0__["Transport"].pause();
     }
   }, {
-    key: "isPlaying",
-    value: function isPlaying() {
+    key: "isPlayingMusic",
+    value: function isPlayingMusic() {
       return tone__WEBPACK_IMPORTED_MODULE_0__["Transport"].state === "started";
     } // sound effects 
 
@@ -1950,7 +1956,7 @@ var renderEndScreen = function renderEndScreen() {
 
 
 function playSound() {
-  if (!musicStatus) return;
+  if (!soundStatus) return;
 
   if (game.player.sound === "hurt") {
     sound.playerHurt();
@@ -2035,15 +2041,15 @@ function handleClick(e) {
   game.player.requestFire(e.offsetX * worldRatio, e.offsetY * worldRatio);
 }
 
-; // audio toggle
+; // music toggle
 
 var musicStatus = true;
 
-function handleMusicToggleClick() {
+function handleMusicClick() {
   if (play) {
-    var audioPlaying = sound.isPlaying();
+    var audioPlaying = sound.isPlayingMusic();
     musicStatus = !audioPlaying;
-    if (audioPlaying) sound.pause();else sound.start();
+    if (audioPlaying) sound.pauseMusic();else sound.startMusic();
   } else {
     musicStatus = !musicStatus;
   }
@@ -2051,6 +2057,14 @@ function handleMusicToggleClick() {
   display.updateMusicToggle(musicStatus);
 }
 
+var soundStatus = true;
+
+function handleSoundClick() {
+  soundStatus = !soundStatus;
+  display.updateSoundToggle(soundStatus);
+}
+
+display.updateSoundToggle(sound);
 document.querySelector(".leaderboard-radio-wrapper").addEventListener("change", function () {
   updateLeaderboard();
 }); // difficulty dropdown
@@ -2063,7 +2077,8 @@ window.addEventListener("resize", handleResize);
 window.addEventListener("keydown", handleKeyChange);
 window.addEventListener("keyup", handleKeyChange);
 window.addEventListener("click", handleClick);
-document.querySelector(".music-toggle").addEventListener("click", handleMusicToggleClick); // handle start / stop game play
+document.querySelector(".music-toggle").addEventListener("click", handleMusicClick);
+document.querySelector(".sound-toggle").addEventListener("click", handleSoundClick); // handle start / stop game play
 
 var imgLoaded = false;
 display.tileSheet.image.addEventListener("load", function () {
@@ -2112,8 +2127,8 @@ function resumeActivity() {
 
   if (game.interval) game.interval.resume(); // sound
 
-  if (musicStatus) sound.start();
-  display.updateMusicToggle(sound.isPlaying());
+  if (musicStatus) sound.startMusic();
+  display.updateMusicToggle(sound.isPlayingMusic());
 }
 
 function pauseActivity() {
@@ -2136,7 +2151,7 @@ function pauseActivity() {
 
   game.interval.pause(); // sound
 
-  sound.pause();
+  sound.pauseMusic();
 }
 
 function endGame() {

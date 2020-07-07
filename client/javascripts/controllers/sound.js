@@ -31,18 +31,18 @@ class Sound {
         this.part.loopEnd = 135;
     }
 
-    start() {
+    startMusic() {
         if (!this.synth) this.createSynth();
         if (!this.part) this.createPart();
         
         Tone.Transport.start();
     }
 
-    pause() {
+    pauseMusic() {
         Tone.Transport.pause();
     }
 
-    isPlaying() {
+    isPlayingMusic() {
         return Tone.Transport.state === "started";
     }
 
