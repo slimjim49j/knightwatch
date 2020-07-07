@@ -234,8 +234,17 @@ function handleSoundClick() {
 display.updateSoundToggle(sound);
 display.updateMusicToggle(musicStatus);
 
+// leaderboard
 document.querySelector(".leaderboard-radio-wrapper").addEventListener("change", () => {
   updateLeaderboard();
+})
+
+document.querySelector(".expand-button").addEventListener("click", () => {
+  const arrowSpan = document.querySelector(".expand-button .arrow");
+  const leaderboards = document.querySelectorAll(".leaderboard");
+  arrowSpan.classList.toggle("arrow-up");
+  arrowSpan.classList.toggle("arrow-down");
+  leaderboards.forEach(leaderboard => leaderboard.classList.toggle("maximize"));
 })
 
 // difficulty dropdown

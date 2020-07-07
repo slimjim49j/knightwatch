@@ -2068,9 +2068,19 @@ function handleSoundClick() {
 }
 
 display.updateSoundToggle(sound);
-display.updateMusicToggle(musicStatus);
+display.updateMusicToggle(musicStatus); // leaderboard
+
 document.querySelector(".leaderboard-radio-wrapper").addEventListener("change", function () {
   updateLeaderboard();
+});
+document.querySelector(".expand-button").addEventListener("click", function () {
+  var arrowSpan = document.querySelector(".expand-button .arrow");
+  var leaderboards = document.querySelectorAll(".leaderboard");
+  arrowSpan.classList.toggle("arrow-up");
+  arrowSpan.classList.toggle("arrow-down");
+  leaderboards.forEach(function (leaderboard) {
+    return leaderboard.classList.toggle("maximize");
+  });
 }); // difficulty dropdown
 
 var difficultySelect = document.querySelector(".difficulty-select");

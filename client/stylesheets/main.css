@@ -191,9 +191,9 @@ p {
 
 
 /* leaderboard */
-/* .leaderboard-difficulty-span {
-    font-size: 20px;
-} */
+.leaderboard-wrapper {
+    padding-bottom: 25px;
+}
 
 .leaderboard-radio-wrapper {
     /* display: inline-block; */
@@ -218,8 +218,16 @@ p {
     opacity: 1;
 }
 
-.leaderboard {
-    padding: 0 0 30px 0;
+.leaderboard li {
+    display: none;
+}
+
+.leaderboard li:nth-child(-n+3) {
+    display: block;
+}
+
+.maximize li {
+    display: block;
 }
 
 .leaderboard li {
@@ -232,6 +240,39 @@ p {
     width: 20%;
     padding-left: 13%;
 }
+
+.expand-button {
+    display: block;
+    background-color: transparent;
+    width: 100%;
+    padding: 10px 0;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.expand-button:hover {
+    background-color: rgb(20, 20, 20);
+}
+
+.arrow {
+  border: solid white;
+  border-width: 0 5px 5px 0;
+  display: inline-block;
+  padding: 10px;
+  margin: 0 auto;
+}
+
+.arrow-up {
+  transform: rotate(-135deg) translate(-5px, -5px);
+  -webkit-transform: rotate(-135deg) translate(-5px, -5px);
+}
+
+.arrow-down {
+  transform: rotate(45deg) translate(-5px, -5px);
+  -webkit-transform: rotate(45deg) translate(-5px, -5px);
+}
+
 
 
 /* highscore modal */
