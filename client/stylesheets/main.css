@@ -4,7 +4,7 @@ http://www.pentacom.jp/pentacom/bitfontmaker2/gallery/?id=195
 */
 @font-face {
     font-family: 'Adventurer';
-    src: url('../fonts/Adventurer.ttf') format('truetype');
+    src: local('Adventurer'), url('../fonts/Adventurer.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
