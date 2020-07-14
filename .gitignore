@@ -3,7 +3,7 @@
 /config/keys_dev.js
 
 # /javascripts/bundle.js
-/client/javascripts/bundle.js.map
+# /client/javascripts/bundle.js.map
 
 /client/tileset/frames
 /client/tileset/crop.py
