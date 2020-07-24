@@ -5,7 +5,8 @@
 # /javascripts/bundle.js
 # /client/javascripts/bundle.js.map
 
-/client/tileset/frames
+/client/tileset/frames/*
+!/client/tileset/frames/knight_f_idle_anim_f0.png
 /client/tileset/crop.py
 /client/tileset/tiles_list_v1.3
 /client/tileset/0x72_DungeonTilesetII_v1.3.zip
