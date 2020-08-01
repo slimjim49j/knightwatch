@@ -15,8 +15,6 @@ class Engine {
     this.playSound = playSound;
 
     this.run = this.run.bind(this);
-
-    this.run = this.run.bind(this);
     this.start = this.start.bind(this);
     this.stop = this.stop.bind(this);
   }
